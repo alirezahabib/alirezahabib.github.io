@@ -21,7 +21,7 @@
       }
     },
     "size": {
-      "value": 0.1,
+      "value": 10.0,
       "random": false,
       "anim": {
         "enable": false
@@ -42,7 +42,7 @@
       "straight": false,
       "out_mode": "out",
       "attract": {
-        "enable": false
+        "enable": true
       }
     }
   },
@@ -54,7 +54,7 @@
         "mode": "grab"
       },
       "onclick": {
-        "enable": false
+        "enable": true
       },
       "resize": true
     },
