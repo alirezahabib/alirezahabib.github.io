@@ -5,7 +5,7 @@ description: Computer Engineering and Physics Student
 taglong: Computer Engineering and Physics Student
 taglong2: Sharif University of Technology
 tagshort: Student at SUT
-url: https://alirezahabib.github.io
+url: https://alirezahabib.me
 baseurl: ""
 permalink: pretty
 repo: https://github.com/alirezahabib/alirezahabib.github.io
@@ -23,9 +23,9 @@ social:
   github: alirezahabib
   linkedin: alirezahabibzadeh
   orcid: 0009-0004-8747-3843
+  # twitter: username
   # instagram: username
   # stackoverflow: 0000000/username
-  # twitter: username
   # facebook: username
 
 # build settings
