@@ -4,7 +4,7 @@ title: Alireza Habibzadeh
 description: Computer Engineering and Physics Student
 taglong: Computer Engineering and Physics Student
 taglong2: Sharif University of Technology
-tagshort: Jekyll theme
+tagshort: Student at SUT
 url: https://alirezahabib.github.io
 baseurl: ""
 permalink: pretty
@@ -20,7 +20,6 @@ photo: /assets/jpg/photo.webp
 # social media links
 
 social:
-  mail: alirezahabib80@gmail.com
   github: alirezahabib
   linkedin: alirezahabibzadeh
   orcid: 0009-0004-8747-3843
