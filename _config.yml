@@ -2,9 +2,10 @@
 
 title: Alireza Habibzadeh
 description: Computer Engineering and Physics Student
-taglong: Jekyll theme for a beautiful online CV
+taglong: Computer Engineering and Physics Student
+taglong2: Sharif University of Technology
 tagshort: Jekyll theme
-url: https://cvless.netlify.app
+url: https://alirezahabib.github.io
 baseurl: ""
 permalink: pretty
 repo: https://github.com/alirezahabib/alirezahabib.github.io
@@ -14,18 +15,19 @@ repo: https://github.com/alirezahabib/alirezahabib.github.io
 author:
   name: Alireza Habibzadeh
   email: alirezahabib80@gmail.com
-photo: /assets/jpg/photo.jpg
+photo: /assets/jpg/photo.webp
 
 # social media links
 
 social:
-  facebook: username
+  mail: alirezahabib80@gmail.com
   github: alirezahabib
-  instagram: username
   linkedin: alirezahabibzadeh
   orcid: 0009-0004-8747-3843
-  stackoverflow: 0000000/username
-  twitter: username
+  # instagram: username
+  # stackoverflow: 0000000/username
+  # twitter: username
+  # facebook: username
 
 # build settings
 

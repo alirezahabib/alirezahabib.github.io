@@ -1,28 +1,35 @@
 <div id="particles-js" class="fullscreen">
   <div class="jumbotron text-center">
     {% if site.photo %}
-    <img class="particles-photo" src="{{ site.photo }}" />
+    <img class="particles-photo" src="{{ site.photo }}" alt="Photo of me in front of a lake"/>
     {% endif %}
     <h1 class="particles-title">{{ site.title }}</h1>
     <h1 class="particles-subtitle">{{ site.taglong }}</h1>
+    <h1 class="particles-subsubtitle">{{ site.taglong2 }}</h1>
     <div class="nowrap">
       {% if site.social.facebook %}
-      <a class="particles-icon" href="https://www.facebook.com/{{ site.social.facebook }}">{% include svg/facebook.svg %}</a>
+      <a class="particles-icon" href="https://www.facebook.com/{{ site.social.facebook }}" target="_blank">{% include svg/facebook.svg %}</a>
       {% endif %}
       {% if site.social.twitter %}
-      <a class="particles-icon" href="https://twitter.com/{{ site.social.twitter }}">{% include svg/twitter.svg %}</a>
+      <a class="particles-icon" href="https://twitter.com/{{ site.social.twitter }}" target="_blank">{% include svg/twitter.svg %}</a>
+      {% endif %}
+      {% if site.social.mail %}
+      <a class="particles-icon" href="mailto:{{ site.social.mail }}">{% include svg/mail.svg %}</a>
       {% endif %}
       {% if site.social.instagram %}      
-      <a class="particles-icon" href="https://www.instagram.com/{{ site.social.instagram }}">{% include svg/instagram.svg %}</a>
+      <a class="particles-icon" href="https://www.instagram.com/{{ site.social.instagram }}" target="_blank">{% include svg/instagram.svg %}</a>
       {% endif %}
       {% if site.social.linkedin %}
-      <a class="particles-icon" href="https://www.linkedin.com/in/{{ site.social.linkedin }}">{% include svg/linkedin.svg %}</a>
+      <a class="particles-icon" href="https://www.linkedin.com/in/{{ site.social.linkedin }}" target="_blank">{% include svg/linkedin.svg %}</a>
       {% endif %}
       {% if site.social.stackoverflow %}
-      <a class="particles-icon" href="https://stackoverflow.com/users/{{ site.social.stackoverflow }}">{% include svg/stackoverflow.svg %}</a>
+      <a class="particles-icon" href="https://stackoverflow.com/users/{{ site.social.stackoverflow }}" target="_blank">{% include svg/stackoverflow.svg %}</a>
       {% endif %}
       {% if site.social.github %}
-      <a class="particles-icon" href="https://github.com/{{ site.social.github }}">{% include svg/github.svg %}</a>
+      <a class="particles-icon" href="https://github.com/{{ site.social.github }}" target="_blank">{% include svg/github.svg %}</a>
+      {% endif %}
+      {% if site.social.orcid %}
+      <a class="particles-icon" href="https://orcid.org/{{ site.social.orcid }}" target="_blank">{% include svg/orcid.svg %}</a>
       {% endif %}
       <a class="particles-icon" href="cv">{% include svg/cv-circled.svg %}</a>
     </div>
