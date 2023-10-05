@@ -1,28 +1,29 @@
 # site settings
 
-title: cvless
-description: Jekyll theme for a beautiful online CV
+title: Alireza Habibzadeh
+description: Computer Engineering and Physics Student
 taglong: Jekyll theme for a beautiful online CV
 tagshort: Jekyll theme
 url: https://cvless.netlify.app
 baseurl: ""
 permalink: pretty
-repo: https://github.com/username/username.github.io
+repo: https://github.com/alirezahabib/alirezahabib.github.io
 
 # author settings
 
 author:
-  name: Place Holder
-  email: username@domain.com
+  name: Alireza Habibzadeh
+  email: alirezahabib80@gmail.com
 photo: /assets/jpg/photo.jpg
 
 # social media links
 
 social:
   facebook: username
-  github: username
+  github: alirezahabib
   instagram: username
-  linkedin: username
+  linkedin: alirezahabibzadeh
+  orcid: 0009-0004-8747-3843
   stackoverflow: 0000000/username
   twitter: username
 
