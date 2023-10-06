@@ -40,7 +40,7 @@
       "direction": "none",
       "random": true,
       "straight": false,
-      "out_mode": "out",
+      "out_mode": "bounce",
       "attract": {
         "enable": true
       }
