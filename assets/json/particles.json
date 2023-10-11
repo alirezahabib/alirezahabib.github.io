@@ -29,14 +29,14 @@
     },
     "line_linked": {
       "enable": true,
-      "distance": 200,
+      "distance": 150,
       "color": "#f1f3f5",
       "opacity": 0.5,
       "width": 1
     },
     "move": {
       "enable": true,
-      "speed": 10,
+      "speed": 8,
       "direction": "none",
       "random": true,
       "straight": false,

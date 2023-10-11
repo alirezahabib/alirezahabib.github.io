@@ -3,16 +3,27 @@ layout: home
 title: Home
 ---
 
-# About
+# Hello 👋,
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+I'm Alireza Habibzadeh, a 4<sup>th</sup> year undergraduate student at Sharif University of Technology, studying computer engineering and physics.
 
-This is the home page. It can be used for a short introduction. [Click here](/cv) to see the full CV, and [here](/AlirezaHabibzadeh-CV.pdf){:target="_blank"} to download a print version. The theme also ships with a blog: [click here](/posts) to scroll posts from the most recent. Finally, [click here](/404) to see a page that can't be found.
+I also had the incredible opportunity to contribute to research at the
+[Laboratory of Photonic Integrated Circuits and Quantum Measurements (LPQM)](https://www.epfl.ch/labs/k-lab/){:target="_blank"}
+at EPFL as a scientific intern under the supervision of
+[Prof.&nbsp;Kippenberg](https://scholar.google.com/citations?user=PRCbG2kAAAAJ){:target="_blank"}.
 
-By default, the theme only contains these few pages in order to stay lean and flexible. However, it can be easily extended to accommodate more pages, [collections](https://jekyllrb.com/docs/collections/), [categories, and tags](https://jekyllrb.com/docs/posts/#tags-and-categories).
+My work primarily focused on developing an automatic calibrator system for characterizing superconducting qubits, utilizing [Quantum Mahines&reg;](https://www.quantum-machines.co/){:target="_blank"} quantum controllers.
 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Beyond my academic pursuits, I have a wide range of interests. 
+I'm a movie enthusiast you can find me [here on IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"}. 
+Spending quality time with friends, writing scripts, coding, and capturing moments through photography are among my favorite pastimes.
+Check out 
+[my online gallery](https://www.icloud.com/sharedalbum/#B0V532ODWroZNhH){:target="_blank"}
+where I keep photos I take.
 
-Below is a list of blog posts included for illustrative purposes. Make sure to delete or modify them before deploying your website.
+Check [video games I have played here.](https://alirezahabib.notion.site/ff364ab0105f4951ae92aeb9585519f6){:target="_blank"}
+
+Please feel free to reach out if you share similar passions or have any questions—I'm always eager to connect with like-minded individuals.
+{% include contact.html %}
 
 {% include archive.html %}
