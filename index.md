@@ -5,7 +5,7 @@ title: Home
 
 # Hello 👋,
 
-I'm Alireza Habibzadeh, a 4<sup>th</sup> year undergraduate student at Sharif University of Technology, studying computer engineering and physics.
+I'm Alireza Habibzadeh, an undergraduate student at Sharif University of Technology, double majoring in computer engineering and physics.
 
 I also had the incredible opportunity to contribute to research at the
 [Laboratory of Photonic Integrated Circuits and Quantum Measurements (LPQM)](https://www.epfl.ch/labs/k-lab/){:target="_blank"}
@@ -15,7 +15,7 @@ at EPFL as a scientific intern under the supervision of
 My work primarily focused on developing an automatic calibrator system for characterizing superconducting qubits, utilizing [Quantum Mahines&reg;](https://www.quantum-machines.co/){:target="_blank"} quantum controllers.
 
 Beyond my academic pursuits, I have a wide range of interests. 
-I'm a movie enthusiast you can find me [here on IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"}. 
+I'm a movie enthusiast and you can find me [here on IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"}. 
 Spending quality time with friends, writing scripts, coding, and capturing moments through photography are my favorite pastimes.
 
 {% comment %} 
