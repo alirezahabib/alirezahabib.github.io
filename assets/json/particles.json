@@ -21,8 +21,8 @@
       }
     },
     "size": {
-      "value": 10.0,
-      "random": false,
+      "value": 16.0,
+      "random": true,
       "anim": {
         "enable": false
       }
