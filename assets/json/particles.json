@@ -60,9 +60,9 @@
     },
     "modes": {
       "grab": {
-        "distance": 100,
+        "distance": 200,
         "line_linked": {
-          "opacity": 0.9
+          "opacity": 0.8
         }
       }
     }
