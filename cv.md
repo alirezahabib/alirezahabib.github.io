@@ -26,22 +26,23 @@ title: CV
 
 # Curriculum Vitæ
 
-**Alireza Habibzadeh**  
 {% include contact.html %}
 
 ---
 
 ## Education
 
-**Sharif University of Technology** — B.Sc. in Computer Engineering 
-*B.Sc. in Physics (Double Major)*  
-
+**Sharif University of Technology**
+*B.Sc. in Computer Engineering*
+*B.Sc. in Physics (Double Major)*
 *Tehran, Iran — September 2020–June 2025 (expected)*
 
-**Young Scholars Club** — Preparation Course for the International Physics Olympiad  
+**Young Scholars Club**
+*Preparation Course for the International Physics Olympiad*
 *Tehran, Iran — 2019–2020*
 
-**Allame Helli High School** — Diploma in Mathematics and Physics, GPA: 19.66/20  
+**Allame Helli High School**
+*Diploma in Mathematics and Physics*
 *Tehran, Iran — 2017–2020*
 
 ---
@@ -60,7 +61,7 @@ title: CV
 ## Honors and Awards
 
 - **EPFL Excellence in Engineering Summer Fellowship** — 2023
-- **Iran’s Elite Companion Scholarship** — 2023  
+- **Iran’s Elite Companion Scholarship** By Mobile Communication Company of Iran — 2023  
 - **Silver Medalist at the 4th European Physics Olympiad (EuPhO)** — 2020  
 - **Sir Isaac Newton Award (University of Waterloo)** — 2020
 - **Gold Medalist at the 31st Iranian Physics Olympiad** — 2019  
@@ -71,8 +72,8 @@ title: CV
 
 - Computational Neuroscience
 - Systems Neuroscience
-- Machine Learning
-- Neuroinformatics
+- Machine Learning and Neural Networks
+- Complex Systems
 
 ---
 
@@ -85,10 +86,10 @@ title: CV
   *Network Science course project analyzing Telegram communication networks using MTProto API.*
 
 - **SVM Classifier for Satellite Imagery** — Fall 2023  
-  *Machine learning project achieving 89.6% accuracy on satellite images using SVM classifiers.*
+  *Machine learning project achieving 89.6% accuracy on the satimage dataset using SVM classifiers.*
 
-- **LPQM Automatic Qubit Characterization Data Pipeline** — Summer 2023  
-  *Developed an automated system to characterize superconducting qubits.*
+- **LPQM Automatic Qubit Characterization System** — Summer 2023  
+  *Developed a data pipeline to characterize superconducting qubits.*
 
 - **LPQM Switch Controller** — Summer 2023  
   *Developed a Python package and GUI for cryogenic switches in a Bluefors dilution refrigerator.*
@@ -133,11 +134,11 @@ title: CV
 
 ## Attended Workshops & Certifications
 
-- **Integrated Photonics for Next Generation Technologies (INGEN2023)** — July 2023  
-- **Unlocking the Brain Will Shape Tomorrow’s World** — March 2023  
-- **Qubit by Qubit** — September 2022–April 2023  
-- **Key Concepts in Blockchain Technology** — Fall 2022  
-- **Hands-on Particle Physics** — March 2018  
+- **Integrated Photonics for Next Generation Technologies (INGEN2023)** — July 2023
+- **Unlocking the Brain Will Shape Tomorrow’s World** — March 2023
+- **Qubit by Qubit** — September 2022–April 2023
+- **Key Concepts in Blockchain Technology** — Fall 2022
+- **Hands-on Particle Physics** by International Particle Physics Outreach Group — March 2018
 
 ---
 
