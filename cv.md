@@ -37,10 +37,6 @@ title: CV
 *B.Sc. in Physics (Double Major)*
 *Tehran, Iran — September 2020–June 2025 (expected)*
 
-**Young Scholars Club**
-*Preparation Course for the International Physics Olympiad*
-*Tehran, Iran — 2019–2020*
-
 **Allame Helli High School**
 *Diploma in Mathematics and Physics*
 *Tehran, Iran — 2017–2020*
@@ -53,15 +49,11 @@ title: CV
 *Lausanne, Switzerland — July 2023–October 2023*  
 - Developed an automatic qubit characterization data pipeline using signal processing and data analysis.
 
-**Mobile Communication Company of Iran (MCI)** — Data Scientist  
-*Tehran, Iran — November 2022–June 2023*
-
 ---
 
 ## Honors and Awards
 
 - **EPFL Excellence in Engineering Summer Fellowship** — 2023
-- **Iran’s Elite Companion Scholarship** By Mobile Communication Company of Iran — 2023  
 - **Silver Medalist at the 4th European Physics Olympiad (EuPhO)** — 2020  
 - **Sir Isaac Newton Award (University of Waterloo)** — 2020
 - **Gold Medalist at the 31st Iranian Physics Olympiad** — 2019  
@@ -115,32 +107,21 @@ title: CV
 
 ## Teaching Experience
 
-- **Programming for Data Analysis (TA)** — Summer 2024  
+- **Programming for Data Analysis (Volunteer TA)** — Summer 2024  
   *Sharif University of Technology*
 
-- **Numerical Computation (TA)** — Spring 2024  
+- **Numerical Computation (Volunteer TA)** — Spring 2024  
   *Sharif University of Technology*
 
-- **Linear Algebra (TA)** — Spring 2023  
+- **Linear Algebra (Volunteer TA)** — Spring 2023  
   *Sharif University of Technology*
 
-- **Engineering Probability and Statistics (TA)** — Fall 2022  
+- **Engineering Probability and Statistics (Volunteer TA)** — Fall 2022  
   *Sharif University of Technology*
 
 - **Physics Olympiad (Teacher)** — 2020–2022  
   *Allame Helli High School*
 
----
-
-## Attended Workshops & Certifications
-
-- **Integrated Photonics for Next Generation Technologies (INGEN2023)** — July 2023
-- **Unlocking the Brain Will Shape Tomorrow’s World** — March 2023
-- **Qubit by Qubit** — September 2022–April 2023
-- **Key Concepts in Blockchain Technology** — Fall 2022
-- **Hands-on Particle Physics** by International Particle Physics Outreach Group — March 2018
-
----
 
 ## Computer Skills
 
@@ -152,4 +133,4 @@ title: CV
 ## Languages
 
 - **Persian**: Native  
-- **English**: Fluent (TOEFL exam scheduled for November 2024)
+- **English**: Fluent, TOEFL iBT Nov 2024: R30, L29, S26, W24
