@@ -93,7 +93,7 @@ title: CV
 
 ## Selected Courses
 
-- **Neuroscience** - Current
+- **Neuroscience** - 20.0/20
 - **Machine Learning** — 20.0/20
 - **Computer Simulation** — 20.0/20
 - **Numerical Computation** — 20.0/20
