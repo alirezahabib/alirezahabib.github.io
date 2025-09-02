@@ -5,7 +5,7 @@ title: Home
 
 # Hello 👋,
 
-I'm Alireza Habibzadeh, an undergraduate student at Sharif University of Technology, double majoring in computer engineering and physics.
+I'm Alireza Habibzadeh, graduate student at University of Southern California, doing a PhD in electrical and computer engineering.
 
 I also had the incredible opportunity to contribute to research at the
 [Laboratory of Photonic Integrated Circuits and Quantum Measurements (LPQM)](https://www.epfl.ch/labs/k-lab/){:target="_blank"}
