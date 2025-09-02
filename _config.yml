@@ -1,10 +1,10 @@
 # site settings
 
 title: Alireza Habibzadeh
-description: Computer Engineering and Physics student
-taglong: Computer Engineering and Physics student
-taglong2: Sharif University of Technology
-tagshort: Student at SUT
+description: Electrical and Computer Engineering PhD student
+taglong: Electrical and Computer Engineering PhD student
+taglong2: University of Southern California
+tagshort: Student at USC
 url: https://alirezahabib.me
 baseurl: ""
 permalink: pretty
@@ -15,7 +15,7 @@ repo: https://github.com/alirezahabib/alirezahabib.github.io
 author:
   name: Alireza Habibzadeh
   email: alirezahabib80@gmail.com
-  emailedu: a.habib@sharif.edu
+  emailedu: ahabibza@usc.edu
 photo: /assets/jpg/photo.webp
 
 # social media links
