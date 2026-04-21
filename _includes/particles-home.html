@@ -14,9 +14,6 @@
       <a title="X" class="particles-icon" href="https://twitter.com/{{ site.social.twitter }}" target="_blank">{% include svg/twitter.svg %}</a>
       {% endif %}
       <a title="Email" class="particles-icon" href="mailto:{{ site.author.email }}">{% include svg/mail.svg %}</a>
-      {% if site.social.instagram %}      
-      <a title="Instagram" class="particles-icon" href="https://www.instagram.com/{{ site.social.instagram }}" target="_blank">{% include svg/instagram.svg %}</a>
-      {% endif %}
       {% if site.social.linkedin %}
       <a title="LinkedIn" class="particles-icon" href="https://www.linkedin.com/in/{{ site.social.linkedin }}" target="_blank">{% include svg/linkedin.svg %}</a>
       {% endif %}
@@ -28,6 +25,9 @@
       {% endif %}
       {% if site.social.orcid %}
       <a title="ORCID" class="particles-icon" href="https://orcid.org/{{ site.social.orcid }}" target="_blank">{% include svg/orcid.svg %}</a>
+      {% endif %}
+      {% if site.social.instagram %}      
+      <a title="Instagram" class="particles-icon" href="https://www.instagram.com/{{ site.social.instagram }}" target="_blank">{% include svg/instagram.svg %}</a>
       {% endif %}
       <a title="Curriculum Vitae" class="particles-icon" href="cv">{% include svg/cv-circled.svg %}</a>
     </div>
