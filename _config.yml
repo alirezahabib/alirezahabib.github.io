@@ -23,9 +23,9 @@ photo: /assets/jpg/photo.webp
 social:
   github: alirezahabib
   linkedin: alirezahabibzadeh
-  orcid: 0009-0004-8747-3843
+  # orcid: 0009-0004-8747-3843
   # twitter: username
-  # instagram: username
+   instagram: alirezahabib
   # stackoverflow: 0000000/username
   # facebook: username
 
