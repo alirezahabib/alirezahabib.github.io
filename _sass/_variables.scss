@@ -8,6 +8,7 @@
   --type-numeric: oldstyle-nums proportional-nums;
   --color-particles-text: var(--oc-gray-1);
   --color-particles-background: var(--oc-gray-7);
+  color-scheme: light dark;
 }
 
 html,
@@ -31,4 +32,17 @@ html[data-theme="dark"] {
   --color-mark: var(--oc-gray-8);
   --color-border: var(--oc-gray-7);
   --color-button: var(--oc-gray-7);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    --color-background: var(--oc-gray-9);
+    --color-text: var(--oc-gray-3);
+    --color-heading: var(--oc-gray-3);
+    --color-link: var(--oc-blue-3);
+    --color-chunk: var(--oc-gray-8);
+    --color-mark: var(--oc-gray-8);
+    --color-border: var(--oc-gray-7);
+    --color-button: var(--oc-gray-7);
+  }
 }
