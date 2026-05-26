@@ -5,7 +5,7 @@ title: Home
 
 # Hello 👋,
 
-I'm Alireza Habibzadeh, a graduate student at the University of Southern California, pursuing a PhD in electrical engineering.
+I'm Alireza Habibzadeh (in Persian: علیرضا حبیب زاده), a graduate student at the University of Southern California, pursuing a PhD in electrical engineering.
 
 I work with the [Neural Systems Engineering & Information Processing Lab](https://nseip.usc.edu/){:target="_blank"}, on developing AI models for understanding neural data.
 
