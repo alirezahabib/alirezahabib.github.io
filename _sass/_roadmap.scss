@@ -3,14 +3,13 @@
 }
 
 .roadmap-heading {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
 
   h2 {
-    margin: 0.1rem 0 0;
+    margin: 0;
   }
 }
 
-.roadmap-eyebrow,
 .roadmap-year {
   font-family: var(--type-mono);
   font-size: 0.7rem;
@@ -18,58 +17,51 @@
   text-transform: uppercase;
 }
 
-.roadmap-eyebrow {
-  margin: 0;
-  color: var(--color-link);
-}
-
 .roadmap-list {
   position: relative;
   margin: 0;
   padding: 0;
   list-style: none;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    top: 2rem;
-    bottom: 2rem;
-    left: 2.02rem;
-    width: 2px;
-    background: repeating-linear-gradient(
-      to bottom,
-      var(--color-text) 0,
-      var(--color-text) 8px,
-      transparent 8px,
-      transparent 11px
-    );
-    opacity: 0.3;
-    transform: rotate(-0.25deg);
-  }
-
-  &::after {
-    left: 2.15rem;
-    opacity: 0.12;
-    transform: rotate(0.35deg);
-  }
 }
 
 .roadmap-stop {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 4.25rem minmax(0, 1fr);
+  grid-template-columns: 7rem minmax(0, 1fr);
   gap: 1.1rem;
-  align-items: center;
+  align-items: start;
   margin: 0 0 1.15rem;
 
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 2rem;
+    left: 2rem;
+    width: 3rem;
+    height: calc(100% + 1.15rem);
+    border-top: 2px dashed var(--color-text);
+    opacity: 0.28;
+  }
+
+  &:nth-child(odd):not(:last-child)::after {
+    border-right: 2px dashed var(--color-text);
+    border-top-right-radius: 3rem 2rem;
+  }
+
+  &:nth-child(even):not(:last-child)::after {
+    border-left: 2px dashed var(--color-text);
+    border-top-left-radius: 3rem 2rem;
+  }
+
   &:nth-child(even) .roadmap-doodle {
+    justify-self: end;
     transform: rotate(1.8deg);
   }
 
   &:nth-child(odd) .roadmap-doodle {
+    justify-self: start;
     transform: rotate(-1.5deg);
   }
 
@@ -80,9 +72,10 @@
 
 .roadmap-doodle {
   position: relative;
+  z-index: 1;
   width: 4rem;
   height: 3.15rem;
-  justify-self: center;
+  margin-top: 0.45rem;
   border: 2px solid var(--color-text);
   border-radius: 0.35rem 0.55rem 0.4rem 0.65rem;
   box-shadow: 2px 2px 0 rgba(134, 142, 150, 0.38);
@@ -90,6 +83,8 @@
 }
 
 .roadmap-note {
+  position: relative;
+  z-index: 1;
   padding: 0.85rem 1rem 0.9rem;
   border: 1.5px solid var(--color-border);
   border-radius: 0.45rem 0.8rem 0.55rem 0.7rem;
@@ -163,18 +158,34 @@
 
 .campus-roof {
   position: absolute;
-  top: 0.1rem;
+  top: 0;
   left: 0.25rem;
   width: 3.5rem;
-  height: 1.05rem;
-  border: 2px solid var(--color-text);
-  background: var(--color-background);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  height: 1.2rem;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0.72rem;
+    width: 1.95rem;
+    border-top: 2px solid var(--color-text);
+  }
+
+  &::before {
+    left: 0;
+    transform: rotate(-23deg);
+  }
+
+  &::after {
+    right: 0;
+    transform: rotate(23deg);
+  }
 }
 
 .campus-building {
   position: absolute;
-  top: 1.05rem;
+  top: 1.02rem;
   left: 0.5rem;
   width: 3rem;
   height: 1.85rem;
@@ -232,9 +243,9 @@
   background: repeating-linear-gradient(
     to bottom,
     #c92a2a 0,
-    #c92a2a 0.25rem,
-    #fff9db 0.25rem,
-    #fff9db 0.5rem
+    #c92a2a 7.6923%,
+    #fff9db 7.6923%,
+    #fff9db 15.3846%
   );
 
   &::before {
@@ -242,21 +253,34 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 1.9rem;
-    height: 1.75rem;
+    width: 48%;
+    height: 53.846%;
     background: #364fc7;
   }
 
-  span {
+  .us-stars {
     position: absolute;
     z-index: 1;
-    top: 0.17rem;
-    left: 0.25rem;
+    top: 0.12rem;
+    left: 0.14rem;
+    display: grid;
+    gap: 0;
     color: #fff;
     font-family: sans-serif;
-    font-size: 0.46rem;
-    line-height: 0.62rem;
-    letter-spacing: 0.12rem;
+
+    i {
+      display: block;
+      height: 0.17rem;
+      font-size: 0.18rem;
+      font-style: normal;
+      line-height: 0.17rem;
+      letter-spacing: 0.035rem;
+      white-space: nowrap;
+    }
+
+    i:nth-child(even) {
+      padding-left: 0.1rem;
+    }
   }
 }
 
@@ -265,19 +289,23 @@
     margin-top: 3rem;
   }
 
-  .roadmap-list {
-    &::before {
-      left: 1.54rem;
-    }
-
-    &::after {
-      left: 1.66rem;
-    }
-  }
-
   .roadmap-stop {
-    grid-template-columns: 3.25rem minmax(0, 1fr);
+    grid-template-columns: 5rem minmax(0, 1fr);
     gap: 0.7rem;
+
+    &:nth-child(odd):not(:last-child)::after,
+    &:nth-child(even):not(:last-child)::after {
+      left: 1.5rem;
+      width: 2rem;
+    }
+
+    &:nth-child(odd):not(:last-child)::after {
+      border-top-right-radius: 2rem 1.5rem;
+    }
+
+    &:nth-child(even):not(:last-child)::after {
+      border-top-left-radius: 2rem 1.5rem;
+    }
   }
 
   .roadmap-doodle {
@@ -300,7 +328,13 @@
   .campus-roof {
     left: 0.15rem;
     width: 2.7rem;
-    height: 0.8rem;
+    height: 0.9rem;
+
+    &::before,
+    &::after {
+      top: 0.54rem;
+      width: 1.52rem;
+    }
   }
 
   .campus-building {
@@ -310,16 +344,20 @@
     height: 1.4rem;
   }
 
-  .us-flag::before {
-    width: 1.45rem;
-    height: 1.3rem;
-  }
+  .us-flag .us-stars {
+    top: 0.08rem;
+    left: 0.1rem;
 
-  .us-flag span {
-    top: 0.09rem;
-    left: 0.18rem;
-    font-size: 0.34rem;
-    line-height: 0.47rem;
+    i {
+      height: 0.13rem;
+      font-size: 0.14rem;
+      line-height: 0.13rem;
+      letter-spacing: 0.025rem;
+    }
+
+    i:nth-child(even) {
+      padding-left: 0.07rem;
+    }
   }
 
   .roadmap-note {
