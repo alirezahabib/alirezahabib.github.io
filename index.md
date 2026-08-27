@@ -28,8 +28,7 @@ where I keep the photos I take.
 
     <li class="roadmap-stop">
       <div class="roadmap-doodle campus-doodle" aria-hidden="true">
-        <span class="campus-roof"></span>
-        <span class="campus-building"></span>
+        <img src="{{ '/assets/svg/campus.svg' | relative_url }}" alt="">
       </div>
       <div class="roadmap-note">
         <p class="roadmap-year">2020–2025</p>
@@ -54,15 +53,15 @@ where I keep the photos I take.
           <i></i><i></i><i></i><i></i><i></i><i></i>
         </span>
         <span class="us-stars">
-          <i>★★★★★★</i>
-          <i>★★★★★</i>
-          <i>★★★★★★</i>
-          <i>★★★★★</i>
-          <i>★★★★★★</i>
-          <i>★★★★★</i>
-          <i>★★★★★★</i>
-          <i>★★★★★</i>
-          <i>★★★★★★</i>
+          <i>★ ★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★</i>
+          <i>★ ★ ★ ★ ★ ★</i>
         </span>
       </div>
       <div class="roadmap-note">
