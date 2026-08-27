@@ -91,10 +91,20 @@
   margin: 0;
   pointer-events: none;
   cursor: default;
-  opacity: 0.2;
-  filter: grayscale(1) saturate(0) contrast(0.72);
+  opacity: 0.16;
+  filter: brightness(0);
   box-shadow: none;
   transform: translate(-50%, -50%) rotate(var(--doodle-rotation, 0deg));
+}
+
+html[data-theme="dark"] .roadmap-doodle-imprint {
+  filter: brightness(0) invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .roadmap-doodle-imprint {
+    filter: brightness(0) invert(1);
+  }
 }
 
 .medal-doodle:not(.roadmap-doodle-imprint) {

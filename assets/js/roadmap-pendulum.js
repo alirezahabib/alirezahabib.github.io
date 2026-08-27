@@ -3,9 +3,12 @@
 
   const STEP = 1 / 60;
   const GRAVITY = 1050;
-  const DAMPING = 0.982;
-  const CONSTRAINT_PASSES = 18;
-  const DRAG_CONSTRAINT_PASSES = 80;
+  const DAMPING = 0.992;
+  const SPRING_STIFFNESS = 0.12;
+  const DRAG_STIFFNESS = 0.45;
+  const MAX_DRAG_STRETCH = 1.2;
+  const CONSTRAINT_PASSES = 2;
+  const DRAG_CONSTRAINT_PASSES = 6;
 
   function initializeRoadmapPendulum() {
     const list = document.querySelector(".roadmap-list");
@@ -102,7 +105,7 @@
       node.y = Math.max(node.halfHeight + padding, Math.min(height - node.halfHeight - padding, node.y));
     }
 
-    function clampDraggedReach(index) {
+    function clampDraggedStretch(index) {
       if (index === 0) {
         return;
       }
@@ -113,8 +116,6 @@
       const maximumReach = relevantLinks.reduce(function (total, length) {
         return total + length;
       }, 0);
-      const longestLink = Math.max.apply(null, relevantLinks);
-      const minimumReach = Math.max(0, longestLink - (maximumReach - longestLink));
       let deltaX = node.x - anchor.x;
       let deltaY = node.y - anchor.y;
       let distance = Math.hypot(deltaX, deltaY);
@@ -124,7 +125,7 @@
         deltaY = node.restY - anchor.restY;
         distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
       }
-      const constrainedDistance = Math.max(minimumReach, Math.min(maximumReach, distance));
+      const constrainedDistance = Math.min(maximumReach * MAX_DRAG_STRETCH, distance);
 
       if (Math.abs(constrainedDistance - distance) < 0.001) {
         return;
@@ -146,8 +147,8 @@
       node.x = point.x + dragging.offsetX;
       node.y = point.y + dragging.offsetY;
       clampNode(node);
-      clampDraggedReach(dragging.index);
-      solveConstraints(DRAG_CONSTRAINT_PASSES);
+      clampDraggedStretch(dragging.index);
+      solveConstraints(DRAG_CONSTRAINT_PASSES, DRAG_STIFFNESS);
       render();
       drawLinks();
       startAnimation();
@@ -157,8 +158,9 @@
       return index === 0 || (dragging && dragging.index === index);
     }
 
-    function solveConstraints(passes) {
+    function solveConstraints(passes, stiffness) {
       const passCount = passes || CONSTRAINT_PASSES;
+      const correctionStrength = typeof stiffness === "number" ? stiffness : SPRING_STIFFNESS;
 
       for (let pass = 0; pass < passCount; pass += 1) {
         for (let index = 0; index < links.length; index += 1) {
@@ -167,15 +169,11 @@
           const deltaX = second.x - first.x;
           const deltaY = second.y - first.y;
           const distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
-          const correction = (distance - links[index]) / distance;
+          const correction = (distance - links[index]) / distance * correctionStrength;
           const firstFixed = isFixed(index);
           const secondFixed = isFixed(index + 1);
 
           if (firstFixed && secondFixed) {
-            if (dragging && dragging.index === index + 1) {
-              second.x = first.x + deltaX / distance * links[index];
-              second.y = first.y + deltaY / distance * links[index];
-            }
             continue;
           }
 
@@ -276,38 +274,58 @@
 
     function drawLinks() {
       context.clearRect(0, 0, width, height);
+
+      const chainMoved = nodes.slice(1).some(function (node) {
+        return Math.hypot(node.x - node.restX, node.y - node.restY) > 1.5;
+      });
+
+      function strokeChain(useRestPosition) {
+        links.forEach(function (_length, index) {
+          const first = nodes[index];
+          const second = nodes[index + 1];
+          const firstX = useRestPosition ? first.restX : first.x;
+          const firstY = useRestPosition ? first.restY : first.y;
+          const secondX = useRestPosition ? second.restX : second.x;
+          const secondY = useRestPosition ? second.restY : second.y;
+          const deltaX = secondX - firstX;
+          const deltaY = secondY - firstY;
+          const distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
+          const unitX = deltaX / distance;
+          const unitY = deltaY / distance;
+          const firstEdge = edgeDistance(first, unitX, unitY);
+          const secondEdge = edgeDistance(second, unitX, unitY);
+
+          context.beginPath();
+          context.moveTo(firstX + unitX * firstEdge, firstY + unitY * firstEdge);
+          context.lineTo(secondX - unitX * secondEdge, secondY - unitY * secondEdge);
+          context.stroke();
+
+          context.setLineDash([]);
+          context.beginPath();
+          context.moveTo(firstX + unitX * firstEdge, firstY + unitY * firstEdge);
+          context.lineTo(firstX + unitX * (firstEdge + 12), firstY + unitY * (firstEdge + 12));
+          context.moveTo(secondX - unitX * secondEdge, secondY - unitY * secondEdge);
+          context.lineTo(secondX - unitX * (secondEdge + 12), secondY - unitY * (secondEdge + 12));
+          context.stroke();
+          context.setLineDash([6, 6]);
+        });
+      }
+
       context.save();
       context.strokeStyle = getComputedStyle(list).getPropertyValue("--color-text").trim();
-      context.globalAlpha = 0.26;
       context.lineWidth = 2;
       context.lineCap = "round";
       context.setLineDash([6, 6]);
 
-      links.forEach(function (_length, index) {
-        const first = nodes[index];
-        const second = nodes[index + 1];
-        const deltaX = second.x - first.x;
-        const deltaY = second.y - first.y;
-        const distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
-        const unitX = deltaX / distance;
-        const unitY = deltaY / distance;
-        const firstEdge = edgeDistance(first, unitX, unitY);
-        const secondEdge = edgeDistance(second, unitX, unitY);
+      if (chainMoved) {
+        context.globalAlpha = 0.13;
+        context.lineWidth = 3;
+        strokeChain(true);
+      }
 
-        context.beginPath();
-        context.moveTo(first.x + unitX * firstEdge, first.y + unitY * firstEdge);
-        context.lineTo(second.x - unitX * secondEdge, second.y - unitY * secondEdge);
-        context.stroke();
-
-        context.setLineDash([]);
-        context.beginPath();
-        context.moveTo(first.x + unitX * firstEdge, first.y + unitY * firstEdge);
-        context.lineTo(first.x + unitX * (firstEdge + 12), first.y + unitY * (firstEdge + 12));
-        context.moveTo(second.x - unitX * secondEdge, second.y - unitY * secondEdge);
-        context.lineTo(second.x - unitX * (secondEdge + 12), second.y - unitY * (secondEdge + 12));
-        context.stroke();
-        context.setLineDash([6, 6]);
-      });
+      context.globalAlpha = 0.26;
+      context.lineWidth = 2;
+      strokeChain(false);
 
       context.restore();
       drawHint();
@@ -445,7 +463,6 @@
       icon.classList.remove("is-dragging");
       icon.setAttribute("aria-grabbed", "false");
       dragging = null;
-      solveConstraints();
       nodes.forEach(function (node) {
         node.previousX = node.x;
         node.previousY = node.y;
@@ -503,8 +520,8 @@
         node.x += directions[event.key][0];
         node.y += directions[event.key][1];
         clampNode(node);
-        clampDraggedReach(index);
-        solveConstraints(DRAG_CONSTRAINT_PASSES);
+        clampDraggedStretch(index);
+        solveConstraints(DRAG_CONSTRAINT_PASSES, DRAG_STIFFNESS);
         nodes.forEach(function (currentNode) {
           currentNode.previousX = currentNode.x;
           currentNode.previousY = currentNode.y;
