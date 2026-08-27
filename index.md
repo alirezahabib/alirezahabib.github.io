@@ -17,7 +17,7 @@ where I keep the photos I take.
   <ol class="roadmap-list">
     <canvas class="roadmap-pendulum" aria-hidden="true"></canvas>
     <li class="roadmap-stop">
-      <div class="roadmap-doodle medal-doodle" role="button" tabindex="0" aria-label="Silver medal, movable pendulum anchor. Drag to reposition the chain.">
+      <div class="roadmap-doodle medal-doodle" role="img" aria-label="Silver medal, fixed pendulum anchor">
         <span>Ag</span>
       </div>
       <div class="roadmap-note">

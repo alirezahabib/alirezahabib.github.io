@@ -16,6 +16,16 @@
       return;
     }
 
+    icons.forEach(function (icon) {
+      const imprint = icon.cloneNode(true);
+      imprint.classList.add("roadmap-doodle-imprint");
+      imprint.setAttribute("aria-hidden", "true");
+      imprint.removeAttribute("aria-label");
+      imprint.removeAttribute("role");
+      imprint.removeAttribute("tabindex");
+      icon.parentNode.insertBefore(imprint, icon);
+    });
+
     const context = canvas.getContext("2d");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let nodes = [];
@@ -227,8 +237,8 @@
       }
 
       const target = nodes[3];
-      const endX = target.x - target.halfWidth - 10;
-      const endY = target.y - 2;
+      const endX = target.restX - target.halfWidth - 10;
+      const endY = target.restY - 2;
       const startX = Math.max(18, endX - 132);
       const startY = endY - 62;
       const textColor = getComputedStyle(list).getPropertyValue("--color-link").trim();
@@ -371,6 +381,10 @@
     }
 
     icons.forEach(function (icon, index) {
+      if (index === 0) {
+        return;
+      }
+
       icon.setAttribute("aria-grabbed", "false");
 
       icon.addEventListener("pointerdown", function (event) {
