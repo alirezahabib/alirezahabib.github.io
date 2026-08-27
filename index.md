@@ -5,7 +5,7 @@ title: Home
 
 # Hello 👋
 
-I'm Alireza Habibzadeh (in Persian: علیرضا حبیب زاده), a second-year PhD student in electrical engineering at USC and a research assistant with Professor Maryam Shanechi in the [Neural Systems Engineering & Information Processing Lab](https://nseip.usc.edu/){:target="_blank"}. We develop machine learning and dynamical systems methods for modeling and decoding brain activity, and we're currently building a foundation model trained on iEEG neural recordings.
+I'm Alireza Habibzadeh (in Persian: علیرضا حبیب زاده), an electrical engineering PhD student at USC and a research assistant with Professor Maryam Shanechi in the [Neural Systems Engineering & Information Processing Lab](https://nseip.usc.edu/){:target="_blank"}. We develop machine learning and dynamical systems methods for modeling and decoding brain activity, and we're currently building a foundation model trained on iEEG neural recordings.
 
 {% comment %}
 Check out
@@ -13,11 +13,7 @@ Check out
 where I keep the photos I take.
 {% endcomment %}
 
-<section class="academic-roadmap" aria-labelledby="roadmap-title">
-  <div class="roadmap-heading">
-    <h2 id="roadmap-title">The road so far</h2>
-  </div>
-
+<section class="academic-roadmap" aria-label="Academic timeline">
   <ol class="roadmap-list">
     <li class="roadmap-stop">
       <div class="roadmap-doodle medal-doodle" aria-hidden="true">
@@ -53,6 +49,10 @@ where I keep the photos I take.
 
     <li class="roadmap-stop">
       <div class="roadmap-doodle us-flag" aria-hidden="true">
+        <span class="us-stripes">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
         <span class="us-stars">
           <i>★★★★★★</i>
           <i>★★★★★</i>
