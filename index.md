@@ -15,8 +15,9 @@ where I keep the photos I take.
 
 <section class="academic-roadmap" aria-label="Academic timeline">
   <ol class="roadmap-list">
+    <canvas class="roadmap-pendulum" aria-hidden="true"></canvas>
     <li class="roadmap-stop">
-      <div class="roadmap-doodle medal-doodle" aria-hidden="true">
+      <div class="roadmap-doodle medal-doodle" role="button" tabindex="0" aria-label="Silver medal, pinned pendulum anchor. Drag to move the anchor.">
         <span>Ag</span>
       </div>
       <div class="roadmap-note">
@@ -27,8 +28,8 @@ where I keep the photos I take.
     </li>
 
     <li class="roadmap-stop">
-      <div class="roadmap-doodle campus-doodle" aria-hidden="true">
-        <img src="{{ '/assets/svg/campus.svg' | relative_url }}" alt="">
+      <div class="roadmap-doodle campus-doodle" role="button" tabindex="0" aria-label="Sharif University, draggable pendulum weight">
+        <img src="{{ '/assets/svg/campus.svg' | relative_url }}" alt="" draggable="false">
       </div>
       <div class="roadmap-note">
         <p class="roadmap-year">2020–2025</p>
@@ -38,7 +39,7 @@ where I keep the photos I take.
     </li>
 
     <li class="roadmap-stop">
-      <div class="roadmap-doodle swiss-flag" aria-hidden="true"></div>
+      <div class="roadmap-doodle swiss-flag" role="button" tabindex="0" aria-label="EPFL in Switzerland, draggable pendulum weight"></div>
       <div class="roadmap-note">
         <p class="roadmap-year">Summer 2023</p>
         <h3>Swiss Federal Technology Institute of Lausanne (EPFL)</h3>
@@ -47,7 +48,7 @@ where I keep the photos I take.
     </li>
 
     <li class="roadmap-stop">
-      <div class="roadmap-doodle us-flag" aria-hidden="true">
+      <div class="roadmap-doodle us-flag" role="button" tabindex="0" aria-label="USC in the United States, draggable pendulum weight">
         <span class="us-stripes">
           <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           <i></i><i></i><i></i><i></i><i></i><i></i>
