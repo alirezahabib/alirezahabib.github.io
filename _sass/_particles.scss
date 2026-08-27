@@ -30,10 +30,13 @@
 }
 
 .particles-photo {
- width: 50%;
- border-radius: 50%;
- margin: auto;
- margin-bottom: 0.5em;
+  width: 50%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center 32%;
+  border-radius: 50%;
+  margin: auto;
+  margin-bottom: 0.5em;
 }
 
 // .particles-photo {

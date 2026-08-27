@@ -1,0 +1,336 @@
+.academic-roadmap {
+  margin: 3.75rem 0 3rem;
+}
+
+.roadmap-heading {
+  margin-bottom: 1.75rem;
+
+  h2 {
+    margin: 0.1rem 0 0;
+  }
+}
+
+.roadmap-eyebrow,
+.roadmap-year {
+  font-family: var(--type-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.roadmap-eyebrow {
+  margin: 0;
+  color: var(--color-link);
+}
+
+.roadmap-list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 2rem;
+    bottom: 2rem;
+    left: 2.02rem;
+    width: 2px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--color-text) 0,
+      var(--color-text) 8px,
+      transparent 8px,
+      transparent 11px
+    );
+    opacity: 0.3;
+    transform: rotate(-0.25deg);
+  }
+
+  &::after {
+    left: 2.15rem;
+    opacity: 0.12;
+    transform: rotate(0.35deg);
+  }
+}
+
+.roadmap-stop {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: center;
+  margin: 0 0 1.15rem;
+
+  &:nth-child(even) .roadmap-doodle {
+    transform: rotate(1.8deg);
+  }
+
+  &:nth-child(odd) .roadmap-doodle {
+    transform: rotate(-1.5deg);
+  }
+
+  &:nth-child(even) .roadmap-note {
+    transform: rotate(-0.2deg);
+  }
+}
+
+.roadmap-doodle {
+  position: relative;
+  width: 4rem;
+  height: 3.15rem;
+  justify-self: center;
+  border: 2px solid var(--color-text);
+  border-radius: 0.35rem 0.55rem 0.4rem 0.65rem;
+  box-shadow: 2px 2px 0 rgba(134, 142, 150, 0.38);
+  background-color: var(--color-background);
+}
+
+.roadmap-note {
+  padding: 0.85rem 1rem 0.9rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 0.45rem 0.8rem 0.55rem 0.7rem;
+  box-shadow: 2px 3px 0 rgba(134, 142, 150, 0.15);
+
+  h3 {
+    margin: 0.1rem 0 0.22rem;
+    font-size: 1.05rem;
+    font-family: var(--type-serif);
+    font-weight: 500;
+    line-height: 1.25;
+    text-transform: none;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+}
+
+.roadmap-year {
+  color: var(--color-link);
+}
+
+.medal-doodle {
+  width: 3.45rem;
+  height: 3.45rem;
+  border-radius: 50% 48% 52% 46%;
+  background: #ced4da;
+  color: #343a40;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -1.05rem;
+    width: 1rem;
+    height: 1.6rem;
+    border: 2px solid var(--color-text);
+    background: #74c0fc;
+  }
+
+  &::before {
+    left: 0.45rem;
+    transform: rotate(-12deg);
+  }
+
+  &::after {
+    right: 0.45rem;
+    transform: rotate(12deg);
+  }
+
+  span {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--type-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+}
+
+.campus-doodle {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.campus-roof {
+  position: absolute;
+  top: 0.1rem;
+  left: 0.25rem;
+  width: 3.5rem;
+  height: 1.05rem;
+  border: 2px solid var(--color-text);
+  background: var(--color-background);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.campus-building {
+  position: absolute;
+  top: 1.05rem;
+  left: 0.5rem;
+  width: 3rem;
+  height: 1.85rem;
+  border: 2px solid var(--color-text);
+  border-radius: 0.12rem 0.2rem 0.1rem 0.25rem;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent 0.38rem,
+    var(--color-text) 0.38rem,
+    var(--color-text) 0.48rem,
+    transparent 0.48rem,
+    transparent 0.82rem
+  ), var(--color-background);
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: -0.25rem;
+    bottom: -0.3rem;
+    left: -0.25rem;
+    height: 0.18rem;
+    border: 2px solid var(--color-text);
+    border-radius: 50%;
+  }
+}
+
+.swiss-flag {
+  background: #e03131;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 0.08rem;
+    background: #fff;
+    transform: translate(-50%, -50%);
+  }
+
+  &::before {
+    width: 2.05rem;
+    height: 0.68rem;
+  }
+
+  &::after {
+    width: 0.68rem;
+    height: 2.05rem;
+  }
+}
+
+.us-flag {
+  overflow: hidden;
+  background: repeating-linear-gradient(
+    to bottom,
+    #c92a2a 0,
+    #c92a2a 0.25rem,
+    #fff9db 0.25rem,
+    #fff9db 0.5rem
+  );
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.9rem;
+    height: 1.75rem;
+    background: #364fc7;
+  }
+
+  span {
+    position: absolute;
+    z-index: 1;
+    top: 0.17rem;
+    left: 0.25rem;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 0.46rem;
+    line-height: 0.62rem;
+    letter-spacing: 0.12rem;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .academic-roadmap {
+    margin-top: 3rem;
+  }
+
+  .roadmap-list {
+    &::before {
+      left: 1.54rem;
+    }
+
+    &::after {
+      left: 1.66rem;
+    }
+  }
+
+  .roadmap-stop {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: 0.7rem;
+  }
+
+  .roadmap-doodle {
+    width: 3rem;
+    height: 2.35rem;
+  }
+
+  .medal-doodle {
+    width: 2.75rem;
+    height: 2.75rem;
+
+    &::before,
+    &::after {
+      top: -0.8rem;
+      width: 0.75rem;
+      height: 1.2rem;
+    }
+  }
+
+  .campus-roof {
+    left: 0.15rem;
+    width: 2.7rem;
+    height: 0.8rem;
+  }
+
+  .campus-building {
+    top: 0.8rem;
+    left: 0.35rem;
+    width: 2.3rem;
+    height: 1.4rem;
+  }
+
+  .us-flag::before {
+    width: 1.45rem;
+    height: 1.3rem;
+  }
+
+  .us-flag span {
+    top: 0.09rem;
+    left: 0.18rem;
+    font-size: 0.34rem;
+    line-height: 0.47rem;
+  }
+
+  .roadmap-note {
+    padding: 0.72rem 0.78rem 0.78rem;
+
+    h3 {
+      font-size: 0.95rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
+}
