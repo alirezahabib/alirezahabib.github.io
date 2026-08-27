@@ -61,7 +61,7 @@
   margin: 0;
   border: 2px solid var(--color-text);
   border-radius: 0.35rem 0.55rem 0.4rem 0.65rem;
-  box-shadow: 2px 2px 0 rgba(134, 142, 150, 0.38);
+  box-shadow: none;
   background-color: var(--color-background);
   cursor: grab;
   touch-action: none;
@@ -78,7 +78,6 @@
   &.is-dragging {
     z-index: 4;
     cursor: grabbing;
-    filter: drop-shadow(0 0.35rem 0.35rem rgba(0, 0, 0, 0.18));
   }
 }
 

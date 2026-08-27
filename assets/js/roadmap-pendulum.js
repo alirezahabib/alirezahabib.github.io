@@ -4,8 +4,8 @@
   const STEP = 1 / 60;
   const GRAVITY = 1050;
   const DAMPING = 0.982;
-  const MAX_DRAG_STRETCH = 1.18;
-  const CONSTRAINT_PASSES = 10;
+  const CONSTRAINT_PASSES = 18;
+  const DRAG_CONSTRAINT_PASSES = 80;
 
   function initializeRoadmapPendulum() {
     const list = document.querySelector(".roadmap-list");
@@ -28,7 +28,6 @@
     let accumulator = 0;
     let quietFrames = 0;
     let resizeTimer = null;
-    let hintVisible = true;
 
     function measure() {
       if (dragging) {
@@ -89,24 +88,36 @@
       node.y = Math.max(node.halfHeight + padding, Math.min(height - node.halfHeight - padding, node.y));
     }
 
-    function limitDraggedStretch(index) {
+    function clampDraggedReach(index) {
       if (index === 0) {
         return;
       }
 
+      const anchor = nodes[0];
       const node = nodes[index];
-      const previousNode = nodes[index - 1];
-      const deltaX = node.x - previousNode.x;
-      const deltaY = node.y - previousNode.y;
-      const distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
-      const maximum = links[index - 1] * MAX_DRAG_STRETCH;
+      const relevantLinks = links.slice(0, index);
+      const maximumReach = relevantLinks.reduce(function (total, length) {
+        return total + length;
+      }, 0);
+      const longestLink = Math.max.apply(null, relevantLinks);
+      const minimumReach = Math.max(0, longestLink - (maximumReach - longestLink));
+      let deltaX = node.x - anchor.x;
+      let deltaY = node.y - anchor.y;
+      let distance = Math.hypot(deltaX, deltaY);
 
-      if (distance <= maximum) {
+      if (distance < 0.0001) {
+        deltaX = node.restX - anchor.restX;
+        deltaY = node.restY - anchor.restY;
+        distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
+      }
+      const constrainedDistance = Math.max(minimumReach, Math.min(maximumReach, distance));
+
+      if (Math.abs(constrainedDistance - distance) < 0.001) {
         return;
       }
 
-      node.x = previousNode.x + deltaX / distance * maximum;
-      node.y = previousNode.y + deltaY / distance * maximum;
+      node.x = anchor.x + deltaX / distance * constrainedDistance;
+      node.y = anchor.y + deltaY / distance * constrainedDistance;
     }
 
     function moveDraggedNode(event) {
@@ -121,8 +132,8 @@
       node.x = point.x + dragging.offsetX;
       node.y = point.y + dragging.offsetY;
       clampNode(node);
-      limitDraggedStretch(dragging.index);
-      solveConstraints();
+      clampDraggedReach(dragging.index);
+      solveConstraints(DRAG_CONSTRAINT_PASSES);
       render();
       drawLinks();
       startAnimation();
@@ -132,8 +143,10 @@
       return index === 0 || (dragging && dragging.index === index);
     }
 
-    function solveConstraints() {
-      for (let pass = 0; pass < CONSTRAINT_PASSES; pass += 1) {
+    function solveConstraints(passes) {
+      const passCount = passes || CONSTRAINT_PASSES;
+
+      for (let pass = 0; pass < passCount; pass += 1) {
         for (let index = 0; index < links.length; index += 1) {
           const first = nodes[index];
           const second = nodes[index + 1];
@@ -145,6 +158,10 @@
           const secondFixed = isFixed(index + 1);
 
           if (firstFixed && secondFixed) {
+            if (dragging && dragging.index === index + 1) {
+              second.x = first.x + deltaX / distance * links[index];
+              second.y = first.y + deltaY / distance * links[index];
+            }
             continue;
           }
 
@@ -166,13 +183,6 @@
     }
 
     function simulate() {
-      const anchor = nodes[0];
-
-      if (!dragging || dragging.index !== 0) {
-        anchor.x += (anchor.restX - anchor.x) * 0.16;
-        anchor.y += (anchor.restY - anchor.y) * 0.16;
-      }
-
       for (let index = 1; index < nodes.length; index += 1) {
         if (dragging && dragging.index === index) {
           continue;
@@ -204,11 +214,15 @@
       const vertical = Math.abs(unitY) > 0.0001
         ? node.halfHeight / Math.abs(unitY)
         : Infinity;
-      return Math.min(horizontal, vertical);
+      const boundary = Math.min(horizontal, vertical);
+
+      // The campus artwork has transparent corners inside its rectangular SVG.
+      // Let the rod continue behind it so it meets the drawn building at any angle.
+      return node.index === 1 ? boundary * 0.58 : boundary;
     }
 
     function drawHint() {
-      if (!hintVisible || nodes.length < 4 || width < 420) {
+      if (nodes.length < 4 || width < 420) {
         return;
       }
 
@@ -286,7 +300,7 @@
     }
 
     function motionLevel() {
-      let amount = Math.abs(nodes[0].x - nodes[0].restX) + Math.abs(nodes[0].y - nodes[0].restY);
+      let amount = 0;
 
       for (let index = 1; index < nodes.length; index += 1) {
         amount += Math.abs(nodes[index].x - nodes[index].previousX);
@@ -337,15 +351,6 @@
       }
     }
 
-    function dismissHint() {
-      if (!hintVisible) {
-        return;
-      }
-
-      hintVisible = false;
-      drawLinks();
-    }
-
     function finishDrag(event) {
       if (!dragging || event.pointerId !== dragging.pointerId) {
         return;
@@ -370,7 +375,6 @@
 
       icon.addEventListener("pointerdown", function (event) {
         event.preventDefault();
-        dismissHint();
         const point = canvasPoint(event);
         const node = nodes[index];
         dragging = {
@@ -389,7 +393,6 @@
       icon.addEventListener("pointerup", finishDrag);
       icon.addEventListener("pointercancel", finishDrag);
       icon.addEventListener("lostpointercapture", finishDrag);
-      icon.addEventListener("click", dismissHint);
 
       icon.addEventListener("keydown", function (event) {
         const movement = 14;
@@ -405,15 +408,14 @@
         }
 
         event.preventDefault();
-        dismissHint();
         const node = nodes[index];
         node.previousX = node.x;
         node.previousY = node.y;
         node.x += directions[event.key][0];
         node.y += directions[event.key][1];
         clampNode(node);
-        limitDraggedStretch(index);
-        solveConstraints();
+        clampDraggedReach(index);
+        solveConstraints(DRAG_CONSTRAINT_PASSES);
         nodes.forEach(function (currentNode) {
           currentNode.previousX = currentNode.x;
           currentNode.previousY = currentNode.y;
