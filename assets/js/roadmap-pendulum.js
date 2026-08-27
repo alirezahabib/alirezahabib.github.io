@@ -3,12 +3,10 @@
 
   const STEP = 1 / 60;
   const GRAVITY = 1050;
-  const DAMPING = 0.992;
-  const SPRING_STIFFNESS = 0.12;
-  const DRAG_STIFFNESS = 0.45;
-  const MAX_DRAG_STRETCH = 1.2;
-  const CONSTRAINT_PASSES = 2;
-  const DRAG_CONSTRAINT_PASSES = 6;
+  const DAMPING = 1;
+  const MAX_THROW_SPEED = 1050;
+  const CONSTRAINT_PASSES = 18;
+  const DRAG_CONSTRAINT_PASSES = 80;
 
   function initializeRoadmapPendulum() {
     const list = document.querySelector(".roadmap-list");
@@ -45,6 +43,8 @@
     let gravityY = GRAVITY;
     let orientationListening = false;
     let orientationPermissionRequested = false;
+    let measuredLayoutWidth = document.documentElement.clientWidth;
+    let hasUserInteracted = false;
 
     function measure() {
       if (dragging) {
@@ -60,6 +60,7 @@
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
       width = fieldRect.width;
       height = fieldRect.height;
+      measuredLayoutWidth = document.documentElement.clientWidth;
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -105,7 +106,7 @@
       node.y = Math.max(node.halfHeight + padding, Math.min(height - node.halfHeight - padding, node.y));
     }
 
-    function clampDraggedStretch(index) {
+    function clampDraggedReach(index) {
       if (index === 0) {
         return;
       }
@@ -116,16 +117,25 @@
       const maximumReach = relevantLinks.reduce(function (total, length) {
         return total + length;
       }, 0);
+      const longestLink = Math.max.apply(null, relevantLinks);
+      const minimumReach = Math.max(0, longestLink - (maximumReach - longestLink));
       let deltaX = node.x - anchor.x;
       let deltaY = node.y - anchor.y;
       let distance = Math.hypot(deltaX, deltaY);
 
       if (distance < 0.0001) {
+        if (minimumReach === 0) {
+          return;
+        }
+
         deltaX = node.restX - anchor.restX;
         deltaY = node.restY - anchor.restY;
         distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
+        node.x = anchor.x + deltaX / distance * minimumReach;
+        node.y = anchor.y + deltaY / distance * minimumReach;
+        return;
       }
-      const constrainedDistance = Math.min(maximumReach * MAX_DRAG_STRETCH, distance);
+      const constrainedDistance = Math.max(minimumReach, Math.min(maximumReach, distance));
 
       if (Math.abs(constrainedDistance - distance) < 0.001) {
         return;
@@ -142,13 +152,23 @@
 
       const point = canvasPoint(event);
       const node = nodes[dragging.index];
-      node.previousX = node.x;
-      node.previousY = node.y;
       node.x = point.x + dragging.offsetX;
       node.y = point.y + dragging.offsetY;
       clampNode(node);
-      clampDraggedStretch(dragging.index);
-      solveConstraints(DRAG_CONSTRAINT_PASSES, DRAG_STIFFNESS);
+      clampDraggedReach(dragging.index);
+      solveConstraints(DRAG_CONSTRAINT_PASSES);
+
+      const now = performance.now();
+      const elapsed = Math.max((now - dragging.lastTime) / 1000, 0.001);
+      const rawVelocityX = (node.x - dragging.lastX) / elapsed;
+      const rawVelocityY = (node.y - dragging.lastY) / elapsed;
+      dragging.velocityX = dragging.velocityX * 0.42 + rawVelocityX * 0.58;
+      dragging.velocityY = dragging.velocityY * 0.42 + rawVelocityY * 0.58;
+      dragging.lastX = node.x;
+      dragging.lastY = node.y;
+      dragging.lastTime = now;
+      node.previousX = node.x;
+      node.previousY = node.y;
       render();
       drawLinks();
       startAnimation();
@@ -158,9 +178,8 @@
       return index === 0 || (dragging && dragging.index === index);
     }
 
-    function solveConstraints(passes, stiffness) {
+    function solveConstraints(passes) {
       const passCount = passes || CONSTRAINT_PASSES;
-      const correctionStrength = typeof stiffness === "number" ? stiffness : SPRING_STIFFNESS;
 
       for (let pass = 0; pass < passCount; pass += 1) {
         for (let index = 0; index < links.length; index += 1) {
@@ -169,11 +188,15 @@
           const deltaX = second.x - first.x;
           const deltaY = second.y - first.y;
           const distance = Math.max(Math.hypot(deltaX, deltaY), 0.0001);
-          const correction = (distance - links[index]) / distance * correctionStrength;
+          const correction = (distance - links[index]) / distance;
           const firstFixed = isFixed(index);
           const secondFixed = isFixed(index + 1);
 
           if (firstFixed && secondFixed) {
+            if (dragging && dragging.index === index + 1) {
+              second.x = first.x + deltaX / distance * links[index];
+              second.y = first.y + deltaY / distance * links[index];
+            }
             continue;
           }
 
@@ -414,6 +437,7 @@
 
       gravityX = nextX;
       gravityY = nextY;
+      hasUserInteracted = true;
       startAnimation();
     }
 
@@ -456,10 +480,20 @@
       }
 
       if (event.type === "pointerup") {
+        const point = canvasPoint(event);
+        const node = nodes[dragging.index];
+        const finalX = point.x + dragging.offsetX;
+        const finalY = point.y + dragging.offsetY;
+
+        if (Math.hypot(finalX - node.x, finalY - node.y) > 0.5) {
+          moveDraggedNode(event);
+        }
+
         requestDeviceOrientation();
       }
 
       const icon = icons[dragging.index];
+      const releasedDrag = dragging;
       icon.classList.remove("is-dragging");
       icon.setAttribute("aria-grabbed", "false");
       dragging = null;
@@ -467,6 +501,25 @@
         node.previousX = node.x;
         node.previousY = node.y;
       });
+
+      if (event.type === "pointerup") {
+        const releaseAge = Math.max((performance.now() - releasedDrag.lastTime) / 1000, 0);
+        const retention = Math.max(0, 1 - releaseAge / 0.14);
+        let velocityX = releasedDrag.velocityX * retention;
+        let velocityY = releasedDrag.velocityY * retention;
+        const speed = Math.hypot(velocityX, velocityY);
+
+        if (speed > MAX_THROW_SPEED) {
+          const scale = MAX_THROW_SPEED / speed;
+          velocityX *= scale;
+          velocityY *= scale;
+        }
+
+        const releasedNode = nodes[releasedDrag.index];
+        releasedNode.previousX = releasedNode.x - velocityX * STEP;
+        releasedNode.previousY = releasedNode.y - velocityY * STEP;
+      }
+
       render();
       drawLinks();
       startAnimation();
@@ -481,13 +534,20 @@
 
       icon.addEventListener("pointerdown", function (event) {
         event.preventDefault();
+        hasUserInteracted = true;
         const point = canvasPoint(event);
         const node = nodes[index];
+        const now = performance.now();
         dragging = {
           index: index,
           pointerId: event.pointerId,
           offsetX: node.x - point.x,
           offsetY: node.y - point.y,
+          lastX: node.x,
+          lastY: node.y,
+          lastTime: now,
+          velocityX: 0,
+          velocityY: 0,
         };
         icon.setPointerCapture(event.pointerId);
         icon.classList.add("is-dragging");
@@ -514,14 +574,15 @@
         }
 
         event.preventDefault();
+        hasUserInteracted = true;
         const node = nodes[index];
         node.previousX = node.x;
         node.previousY = node.y;
         node.x += directions[event.key][0];
         node.y += directions[event.key][1];
         clampNode(node);
-        clampDraggedStretch(index);
-        solveConstraints(DRAG_CONSTRAINT_PASSES, DRAG_STIFFNESS);
+        clampDraggedReach(index);
+        solveConstraints(DRAG_CONSTRAINT_PASSES);
         nodes.forEach(function (currentNode) {
           currentNode.previousX = currentNode.x;
           currentNode.previousY = currentNode.y;
@@ -539,6 +600,12 @@
     });
 
     window.addEventListener("resize", function () {
+      const layoutWidth = document.documentElement.clientWidth;
+
+      if (Math.abs(layoutWidth - measuredLayoutWidth) < 2) {
+        return;
+      }
+
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(measure, 120);
     });
@@ -549,7 +616,11 @@
       listenForDeviceOrientation();
     }
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(measure);
+      document.fonts.ready.then(function () {
+        if (!hasUserInteracted) {
+          measure();
+        }
+      });
     }
   }
 
