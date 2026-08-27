@@ -38,6 +38,10 @@
     let accumulator = 0;
     let quietFrames = 0;
     let resizeTimer = null;
+    let gravityX = 0;
+    let gravityY = GRAVITY;
+    let orientationListening = false;
+    let orientationPermissionRequested = false;
 
     function measure() {
       if (dragging) {
@@ -203,8 +207,8 @@
         const velocityY = (node.y - node.previousY) * DAMPING;
         node.previousX = node.x;
         node.previousY = node.y;
-        node.x += velocityX;
-        node.y += velocityY + GRAVITY * STEP * STEP;
+        node.x += velocityX + gravityX * STEP * STEP;
+        node.y += velocityY + gravityY * STEP * STEP;
       }
 
       solveConstraints();
@@ -361,9 +365,80 @@
       }
     }
 
+    function screenOrientationAngle() {
+      if (window.screen.orientation && typeof window.screen.orientation.angle === "number") {
+        return window.screen.orientation.angle;
+      }
+
+      return typeof window.orientation === "number" ? window.orientation : 0;
+    }
+
+    function applyDeviceOrientation(event) {
+      if (typeof event.beta !== "number" || typeof event.gamma !== "number") {
+        return;
+      }
+
+      const beta = event.beta * Math.PI / 180;
+      const gamma = event.gamma * Math.PI / 180;
+      const deviceX = Math.sin(gamma) * Math.cos(beta);
+      const deviceY = Math.sin(beta);
+      const screenAngle = screenOrientationAngle() * Math.PI / 180;
+      const cosine = Math.cos(screenAngle);
+      const sine = Math.sin(screenAngle);
+      const targetX = GRAVITY * (deviceX * cosine + deviceY * sine);
+      const targetY = GRAVITY * (-deviceX * sine + deviceY * cosine);
+      const nextX = gravityX + (targetX - gravityX) * 0.18;
+      const nextY = gravityY + (targetY - gravityY) * 0.18;
+
+      if (Math.abs(nextX - gravityX) < 0.35 && Math.abs(nextY - gravityY) < 0.35) {
+        return;
+      }
+
+      gravityX = nextX;
+      gravityY = nextY;
+      startAnimation();
+    }
+
+    function listenForDeviceOrientation() {
+      if (orientationListening) {
+        return;
+      }
+
+      orientationListening = true;
+      window.addEventListener("deviceorientation", applyDeviceOrientation, true);
+    }
+
+    function requestDeviceOrientation() {
+      if (orientationPermissionRequested || typeof window.DeviceOrientationEvent === "undefined") {
+        return;
+      }
+
+      orientationPermissionRequested = true;
+      const permissionRequest = window.DeviceOrientationEvent.requestPermission;
+
+      if (typeof permissionRequest !== "function") {
+        listenForDeviceOrientation();
+        return;
+      }
+
+      permissionRequest.call(window.DeviceOrientationEvent)
+        .then(function (permission) {
+          if (permission === "granted") {
+            listenForDeviceOrientation();
+          }
+        })
+        .catch(function () {
+          // Keep ordinary downward gravity when sensor access is unavailable.
+        });
+    }
+
     function finishDrag(event) {
       if (!dragging || event.pointerId !== dragging.pointerId) {
         return;
+      }
+
+      if (event.type === "pointerup") {
+        requestDeviceOrientation();
       }
 
       const icon = icons[dragging.index];
@@ -452,6 +527,10 @@
     });
 
     measure();
+    if (typeof window.DeviceOrientationEvent !== "undefined"
+        && typeof window.DeviceOrientationEvent.requestPermission !== "function") {
+      listenForDeviceOrientation();
+    }
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(measure);
     }
