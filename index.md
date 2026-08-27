@@ -29,7 +29,7 @@ where I keep the photos I take.
 
     <li class="roadmap-stop">
       <div class="roadmap-doodle campus-doodle" role="button" tabindex="0" aria-label="Sharif University, draggable pendulum weight">
-        <img src="{{ '/assets/svg/campus.svg' | relative_url }}" alt="" draggable="false">
+        <img src="{{ '/assets/svg/campus.svg' | relative_url }}?v=2" alt="" draggable="false">
       </div>
       <div class="roadmap-note">
         <p class="roadmap-year">2020–2025</p>
