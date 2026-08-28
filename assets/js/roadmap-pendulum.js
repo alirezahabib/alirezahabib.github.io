@@ -13,7 +13,7 @@
     const canvas = list && list.querySelector(".roadmap-pendulum");
     const icons = list ? Array.from(list.querySelectorAll(".roadmap-doodle")) : [];
 
-    if (!list || !canvas || icons.length !== 4) {
+    if (!list || !canvas || icons.length !== 5) {
       return;
     }
 
@@ -257,16 +257,17 @@
     }
 
     function drawHint() {
-      if (nodes.length < 4 || width < 420) {
+      if (nodes.length < 2) {
         return;
       }
 
-      const target = nodes[3];
+      const target = nodes[nodes.length - 1];
       const endX = target.restX - target.halfWidth - 10;
       const endY = target.restY - 2;
       const startX = Math.max(18, endX - 132);
       const startY = endY - 62;
       const textColor = getComputedStyle(list).getPropertyValue("--color-link").trim();
+      const hasSideRoom = target.restX - target.halfWidth >= 165;
 
       context.save();
       context.strokeStyle = textColor;
@@ -277,21 +278,43 @@
       context.lineJoin = "round";
       context.setLineDash([]);
       context.font = "italic 15px Piazzolla, serif";
-      context.fillText("drag me!", startX + 3, startY - 10);
 
-      context.beginPath();
-      context.moveTo(startX + 8, startY);
-      context.bezierCurveTo(startX + 58, startY - 24, startX + 70, startY + 34, startX + 33, startY + 38);
-      context.bezierCurveTo(startX - 2, startY + 42, startX + 5, startY + 3, startX + 45, startY + 10);
-      context.bezierCurveTo(startX + 88, startY + 18, startX + 73, startY + 59, startX + 48, startY + 48);
-      context.bezierCurveTo(startX + 31, startY + 40, startX + 65, startY + 38, endX, endY);
-      context.stroke();
+      if (hasSideRoom) {
+        context.fillText("drag me!", startX + 3, startY - 10);
 
-      context.beginPath();
-      context.moveTo(endX - 11, endY - 7);
-      context.lineTo(endX, endY);
-      context.lineTo(endX - 11, endY + 6);
-      context.stroke();
+        context.beginPath();
+        context.moveTo(startX + 8, startY);
+        context.bezierCurveTo(startX + 58, startY - 24, startX + 70, startY + 34, startX + 33, startY + 38);
+        context.bezierCurveTo(startX - 2, startY + 42, startX + 5, startY + 3, startX + 45, startY + 10);
+        context.bezierCurveTo(startX + 88, startY + 18, startX + 73, startY + 59, startX + 48, startY + 48);
+        context.bezierCurveTo(startX + 31, startY + 40, startX + 65, startY + 38, endX, endY);
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(endX - 11, endY - 7);
+        context.lineTo(endX, endY);
+        context.lineTo(endX - 11, endY + 6);
+        context.stroke();
+      } else {
+        const bottomX = target.restX;
+        const bottomY = target.restY + target.halfHeight + 8;
+        const labelX = Math.max(8, Math.min(width - 68, bottomX - 27));
+        const labelY = bottomY + 70;
+
+        context.fillText("drag me!", labelX, labelY);
+        context.beginPath();
+        context.moveTo(labelX + 36, labelY - 13);
+        context.bezierCurveTo(labelX + 67, labelY - 30, labelX + 40, labelY - 62, labelX + 15, labelY - 43);
+        context.bezierCurveTo(labelX - 9, labelY - 24, labelX + 20, labelY - 10, labelX + 34, labelY - 35);
+        context.bezierCurveTo(labelX + 48, labelY - 59, bottomX + 16, bottomY + 24, bottomX, bottomY);
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(bottomX - 7, bottomY + 11);
+        context.lineTo(bottomX, bottomY);
+        context.lineTo(bottomX + 8, bottomY + 10);
+        context.stroke();
+      }
       context.restore();
     }
 
@@ -322,15 +345,6 @@
           context.moveTo(firstX + unitX * firstEdge, firstY + unitY * firstEdge);
           context.lineTo(secondX - unitX * secondEdge, secondY - unitY * secondEdge);
           context.stroke();
-
-          context.setLineDash([]);
-          context.beginPath();
-          context.moveTo(firstX + unitX * firstEdge, firstY + unitY * firstEdge);
-          context.lineTo(firstX + unitX * (firstEdge + 12), firstY + unitY * (firstEdge + 12));
-          context.moveTo(secondX - unitX * secondEdge, secondY - unitY * secondEdge);
-          context.lineTo(secondX - unitX * (secondEdge + 12), secondY - unitY * (secondEdge + 12));
-          context.stroke();
-          context.setLineDash([6, 6]);
         });
       }
 

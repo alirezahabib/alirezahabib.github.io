@@ -17,7 +17,18 @@ where I keep the photos I take.
   <ol class="roadmap-list">
     <canvas class="roadmap-pendulum" aria-hidden="true"></canvas>
     <li class="roadmap-stop">
-      <div class="roadmap-doodle medal-doodle" role="img" aria-label="Silver medal, fixed pendulum anchor">
+      <div class="roadmap-doodle medal-doodle gold-medal anchor-doodle" role="img" aria-label="Gold medal, fixed pendulum anchor">
+        <span>Au</span>
+      </div>
+      <div class="roadmap-note">
+        <p class="roadmap-year">2019</p>
+        <h3>Iranian Physics Olympiad</h3>
+        <p>Gold medalist in the 31st national competition.</p>
+      </div>
+    </li>
+
+    <li class="roadmap-stop">
+      <div class="roadmap-doodle medal-doodle" role="button" tabindex="0" aria-label="European Physics Olympiad silver medal, draggable pendulum weight">
         <span>Ag</span>
       </div>
       <div class="roadmap-note">
