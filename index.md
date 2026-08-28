@@ -23,7 +23,7 @@ where I keep the photos I take.
       <div class="roadmap-note">
         <p class="roadmap-year">2019</p>
         <h3>Iranian Physics Olympiad</h3>
-        <p>Gold medalist in the 31st national competition.</p>
+        <p>Gold medalist in the 31<sup>st</sup> national competition.</p>
       </div>
     </li>
 
@@ -34,7 +34,7 @@ where I keep the photos I take.
       <div class="roadmap-note">
         <p class="roadmap-year">2020</p>
         <h3>European Physics Olympiad</h3>
-        <p>Silver medalist at the fourth EuPhO.</p>
+        <p>Silver medalist at the 4<sup>th</sup> EuPhO.</p>
       </div>
     </li>
 
@@ -54,7 +54,7 @@ where I keep the photos I take.
       <div class="roadmap-note">
         <p class="roadmap-year">Summer 2023</p>
         <h3>Swiss Federal Technology Institute of Lausanne (EPFL)</h3>
-        <p>E3 research intern at <a href="https://www.epfl.ch/labs/k-lab/" target="_blank">LPQM</a>, working on automated superconducting-qubit characterization.</p>
+        <p><a href="https://eee.epfl.ch/" target="_blank">E3</a> research intern at <a href="https://www.epfl.ch/labs/k-lab/" target="_blank">LPQM</a>.</p>
       </div>
     </li>
 
@@ -79,13 +79,13 @@ where I keep the photos I take.
       <div class="roadmap-note">
         <p class="roadmap-year">2025–present</p>
         <h3>University of Southern California</h3>
-        <p>PhD student and research assistant in the NSEIP Lab.</p>
+        <p>PhD student and research assistant in the <a href="https://nseip.usc.edu/" target="_blank">NSEIP Lab</a>.</p>
       </div>
     </li>
   </ol>
 </section>
 
-Outside the lab, I enjoy movies, video games, swimming, photography, and coding, which lately includes some vibe coding! You can find my movie ratings on [IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"} and my game collection on [Notion](https://alirezahabib.notion.site/9225b5de29be823fa24d01109ea9bc77){:target="_blank"}. I volunteer with the Los Angeles Regional Food Bank, Science Olympiad, and USC's student mentoring program. I also edited Persian Wikipedia for years, but I retired from that journey because AI does a better job than me.
+Outside the lab, I enjoy movies, video games, swimming, photography, and coding. You can find my movie ratings on [IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"} and my game collection on [Notion](https://alirezahabib.notion.site/9225b5de29be823fa24d01109ea9bc77){:target="_blank"}. I volunteer with the Los Angeles Regional Food Bank, Science Olympiad, and USC's student mentoring program. I also edited Persian Wikipedia for years, but I retired from that journey because AI does a better job than me.
 
 {% include contact.html %}
 

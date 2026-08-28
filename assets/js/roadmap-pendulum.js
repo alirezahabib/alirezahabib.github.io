@@ -4,7 +4,6 @@
   const STEP = 1 / 60;
   const GRAVITY = 1050;
   const DAMPING = 1;
-  const MAX_THROW_SPEED = 1050;
   const CONSTRAINT_PASSES = 18;
   const DRAG_CONSTRAINT_PASSES = 80;
 
@@ -150,6 +149,10 @@
         return;
       }
 
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+
       const point = canvasPoint(event);
       const node = nodes[dragging.index];
       node.x = point.x + dragging.offsetX;
@@ -263,7 +266,7 @@
 
       const target = nodes[nodes.length - 1];
       const endX = target.restX - target.halfWidth - 10;
-      const endY = target.restY - 2;
+      const endY = target.restY;
       const startX = Math.max(18, endX - 132);
       const startY = endY - 62;
       const textColor = getComputedStyle(list).getPropertyValue("--color-link").trim();
@@ -279,6 +282,24 @@
       context.setLineDash([]);
       context.font = "italic 15px Piazzolla, serif";
 
+      function drawArrowhead(tipX, tipY, tangentX, tangentY) {
+        const tangentLength = Math.max(Math.hypot(tangentX, tangentY), 0.0001);
+        const unitX = tangentX / tangentLength;
+        const unitY = tangentY / tangentLength;
+        const normalX = -unitY;
+        const normalY = unitX;
+        const arrowLength = 11;
+        const arrowWidth = 6.5;
+        const baseX = tipX - unitX * arrowLength;
+        const baseY = tipY - unitY * arrowLength;
+
+        context.beginPath();
+        context.moveTo(baseX + normalX * arrowWidth, baseY + normalY * arrowWidth);
+        context.lineTo(tipX, tipY);
+        context.lineTo(baseX - normalX * arrowWidth, baseY - normalY * arrowWidth);
+        context.stroke();
+      }
+
       if (hasSideRoom) {
         context.fillText("drag me!", startX + 3, startY - 10);
 
@@ -287,14 +308,9 @@
         context.bezierCurveTo(startX + 58, startY - 24, startX + 70, startY + 34, startX + 33, startY + 38);
         context.bezierCurveTo(startX - 2, startY + 42, startX + 5, startY + 3, startX + 45, startY + 10);
         context.bezierCurveTo(startX + 88, startY + 18, startX + 73, startY + 59, startX + 48, startY + 48);
-        context.bezierCurveTo(startX + 31, startY + 40, startX + 65, startY + 38, endX, endY);
+        context.bezierCurveTo(startX + 31, startY + 40, endX - 23, endY, endX, endY);
         context.stroke();
-
-        context.beginPath();
-        context.moveTo(endX - 11, endY - 7);
-        context.lineTo(endX, endY);
-        context.lineTo(endX - 11, endY + 6);
-        context.stroke();
+        drawArrowhead(endX, endY, 1, 0);
       } else {
         const bottomX = target.restX;
         const bottomY = target.restY + target.halfHeight + 8;
@@ -306,14 +322,9 @@
         context.moveTo(labelX + 36, labelY - 13);
         context.bezierCurveTo(labelX + 67, labelY - 30, labelX + 40, labelY - 62, labelX + 15, labelY - 43);
         context.bezierCurveTo(labelX - 9, labelY - 24, labelX + 20, labelY - 10, labelX + 34, labelY - 35);
-        context.bezierCurveTo(labelX + 48, labelY - 59, bottomX + 16, bottomY + 24, bottomX, bottomY);
+        context.bezierCurveTo(labelX + 48, labelY - 59, bottomX, bottomY + 23, bottomX, bottomY);
         context.stroke();
-
-        context.beginPath();
-        context.moveTo(bottomX - 7, bottomY + 11);
-        context.lineTo(bottomX, bottomY);
-        context.lineTo(bottomX + 8, bottomY + 10);
-        context.stroke();
+        drawArrowhead(bottomX, bottomY, 0, -1);
       }
       context.restore();
     }
@@ -519,15 +530,8 @@
       if (event.type === "pointerup") {
         const releaseAge = Math.max((performance.now() - releasedDrag.lastTime) / 1000, 0);
         const retention = Math.max(0, 1 - releaseAge / 0.14);
-        let velocityX = releasedDrag.velocityX * retention;
-        let velocityY = releasedDrag.velocityY * retention;
-        const speed = Math.hypot(velocityX, velocityY);
-
-        if (speed > MAX_THROW_SPEED) {
-          const scale = MAX_THROW_SPEED / speed;
-          velocityX *= scale;
-          velocityY *= scale;
-        }
+        const velocityX = releasedDrag.velocityX * retention;
+        const velocityY = releasedDrag.velocityY * retention;
 
         const releasedNode = nodes[releasedDrag.index];
         releasedNode.previousX = releasedNode.x - velocityX * STEP;
@@ -569,11 +573,6 @@
         startAnimation();
       });
 
-      icon.addEventListener("pointermove", moveDraggedNode);
-      icon.addEventListener("pointerup", finishDrag);
-      icon.addEventListener("pointercancel", finishDrag);
-      icon.addEventListener("lostpointercapture", finishDrag);
-
       icon.addEventListener("keydown", function (event) {
         const movement = 14;
         const directions = {
@@ -606,6 +605,10 @@
         startAnimation();
       });
     });
+
+    window.addEventListener("pointermove", moveDraggedNode, { passive: false });
+    window.addEventListener("pointerup", finishDrag);
+    window.addEventListener("pointercancel", finishDrag);
 
     const themeObserver = new MutationObserver(drawLinks);
     themeObserver.observe(document.documentElement, {

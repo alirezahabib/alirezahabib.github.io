@@ -116,6 +116,8 @@ html[data-theme="dark"] .roadmap-doodle-imprint {
   position: relative;
   z-index: 1;
   display: flex;
+  width: min(100%, 27rem);
+  justify-self: start;
   flex-direction: column;
   justify-content: center;
   padding: 0.85rem 1rem 0.9rem;
@@ -136,6 +138,11 @@ html[data-theme="dark"] .roadmap-doodle-imprint {
     margin: 0;
     font-size: 0.88rem;
     line-height: 1.45;
+  }
+
+  sup {
+    font-size: 0.7em;
+    line-height: 0;
   }
 }
 
@@ -375,6 +382,7 @@ html[data-theme="dark"] .campus-doodle img {
   }
 
   .roadmap-note {
+    width: 100%;
     padding: 0.72rem 0.78rem 0.78rem;
 
     h3 {
