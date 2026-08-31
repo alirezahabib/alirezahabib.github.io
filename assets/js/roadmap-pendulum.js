@@ -322,7 +322,7 @@
         context.moveTo(labelX + 38, labelY - 11);
         context.bezierCurveTo(labelX + 60, labelY - 26, labelX + 48, labelY - 51, labelX + 27, labelY - 45);
         context.bezierCurveTo(labelX + 6, labelY - 39, labelX + 12, labelY - 18, labelX + 32, labelY - 27);
-        context.bezierCurveTo(labelX + 49, labelY - 36, bottomX + 10, bottomY + 20, bottomX, bottomY);
+        context.bezierCurveTo(labelX + 49, labelY - 36, bottomX, bottomY + 20, bottomX, bottomY);
         context.stroke();
         drawArrowhead(bottomX, bottomY, 0, -1);
       }

@@ -100,3 +100,53 @@ a.reversefootnote {
     border: none;
   }
 }
+
+.apple-easter-trigger {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dotted transparent;
+  background: none;
+  color: var(--color-link);
+  font: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  cursor: pointer;
+
+  &:focus,
+  &:hover {
+    border-bottom-color: var(--color-link);
+    outline: none;
+  }
+
+  &.is-active {
+    background: linear-gradient(90deg, #61bb46, #fdb827, #f5821f, #e03a3e, #963d97, #009ddc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+html.classic-mac-cursor,
+html.classic-mac-cursor * {
+  cursor: none !important;
+}
+
+.classic-mac-pointer {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  display: none;
+  width: 18px;
+  height: 26px;
+  background: #fff;
+  clip-path: polygon(0 0, 0 22px, 5px 17px, 9px 26px, 14px 24px, 10px 15px, 18px 15px);
+  filter: drop-shadow(1px 0 #111) drop-shadow(-1px 0 #111) drop-shadow(0 1px #111) drop-shadow(0 -1px #111);
+  pointer-events: none;
+
+  &.is-visible {
+    display: block;
+  }
+}
