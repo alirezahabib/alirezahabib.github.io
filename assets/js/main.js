@@ -1,7 +1,6 @@
 (function () {
   "use strict";
 
-  const BRAIN_CLICK_COUNT = 3;
   const BRAIN_POINTS = [
     [0.50, 0.92], [0.42, 0.88], [0.34, 0.84], [0.28, 0.77],
     [0.20, 0.72], [0.16, 0.63], [0.11, 0.56], [0.13, 0.46],
@@ -24,146 +23,78 @@
     [0.56, 0.79]
   ];
 
-  function easeInOutCubic(value) {
-    return value < 0.5
-      ? 4 * value * value * value
-      : 1 - Math.pow(-2 * value + 2, 3) / 2;
-  }
+  function arrangeBrainOutline(particles) {
+    const frame = document.querySelector(".particles-photo-frame");
 
-  function mix(start, end, amount) {
-    return start + (end - start) * amount;
-  }
-
-  function animateBrainOutline(particles) {
-    if (particles.__brainAnimating) {
+    if (!frame) {
       return;
     }
 
-    const allParticles = particles.particles.array;
-    const missingCount = Math.max(0, BRAIN_POINTS.length - allParticles.length);
-
-    if (missingCount) {
-      particles.fn.modes.pushParticles(missingCount);
-    }
-
-    const completeArray = particles.particles.array;
-    const brainParticles = completeArray.slice(-BRAIN_POINTS.length);
-    const pixelRatio = particles.canvas.pxratio || 1;
-    const brainWidth = Math.min(particles.canvas.w * 0.78, 420 * pixelRatio);
-    const brainHeight = brainWidth * 0.72;
-    const centerX = particles.canvas.w * 0.5;
-    const centerY = Math.min(particles.canvas.h * 0.35, 285 * pixelRatio);
-    const targetRadius = 4 * pixelRatio;
-    const originalMoveState = particles.particles.move.enable;
-    const originalLinkDistance = particles.particles.line_linked.distance;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const morphDuration = reducedMotion ? 180 : 1050;
-    const holdDuration = reducedMotion ? 500 : 1350;
-    const returnDuration = reducedMotion ? 180 : 850;
-    const originalStates = brainParticles.map(function (particle) {
-      return {
-        x: particle.x,
-        y: particle.y,
-        vx: particle.vx,
-        vy: particle.vy,
-        radius: particle.radius,
-        opacity: particle.opacity
-      };
-    });
-    const targets = BRAIN_POINTS.map(function (point) {
-      return {
-        x: centerX + (point[0] - 0.5) * brainWidth,
-        y: centerY + (point[1] - 0.5) * brainHeight
-      };
-    });
-    let startTime = 0;
-
-    particles.__brainAnimating = true;
+    particles.particles.number.value = BRAIN_POINTS.length;
+    particles.particles.number.density.enable = false;
     particles.particles.move.enable = false;
-    particles.particles.array = brainParticles;
-    particles.particles.line_linked.distance = brainWidth * 0.105;
 
-    function restoreParticles() {
-      brainParticles.forEach(function (particle, index) {
-        const original = originalStates[index];
-        particle.x = original.x;
-        particle.y = original.y;
-        particle.vx = original.vx;
-        particle.vy = original.vy;
-        particle.radius = original.radius;
-        particle.opacity = original.opacity;
-      });
-      particles.particles.array = completeArray;
-      particles.particles.line_linked.distance = originalLinkDistance;
-      particles.particles.move.enable = originalMoveState;
-      particles.__brainAnimating = false;
+    function ensureBrainParticles() {
+      const particleArray = particles.particles.array;
+      const missingCount = Math.max(0, BRAIN_POINTS.length - particleArray.length);
 
-      if (originalMoveState) {
-        particles.fn.vendors.draw();
-      } else {
-        particles.fn.particlesDraw();
+      if (missingCount) {
+        particles.fn.modes.pushParticles(missingCount);
       }
+
+      if (!particles.__brainReady && particles.particles.array.length > BRAIN_POINTS.length) {
+        particles.particles.array.splice(BRAIN_POINTS.length);
+      }
+
+      particles.__brainReady = true;
+      return particles.particles.array.slice(0, BRAIN_POINTS.length);
     }
 
-    function drawFrame(time) {
-      if (!startTime) {
-        startTime = time;
-      }
+    function drawBrain(time) {
+      const brainParticles = ensureBrainParticles();
+      const canvasRect = particles.canvas.el.getBoundingClientRect();
+      const frameRect = frame.getBoundingClientRect();
+      const ratioX = particles.canvas.w / canvasRect.width;
+      const ratioY = particles.canvas.h / canvasRect.height;
+      const spaceAbove = Math.max(80, frameRect.top - canvasRect.top);
+      const brainWidth = Math.min(
+        frameRect.width,
+        canvasRect.width * 0.46,
+        spaceAbove * 1.15
+      ) * ratioX;
+      const brainHeight = brainWidth * 0.72;
+      const centerX = (frameRect.left + frameRect.width / 2 - canvasRect.left) * ratioX;
+      const centerY = Math.max(
+        brainHeight / 2 + 7 * ratioY,
+        (frameRect.top - canvasRect.top) * ratioY - brainHeight / 2 - 10 * ratioY
+      );
+      const targetRadius = 2.35 * ratioX;
+      const wobble = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1.2 * ratioX;
 
-      const elapsed = time - startTime;
-      const morphEnd = morphDuration;
-      const holdEnd = morphEnd + holdDuration;
-      const returnEnd = holdEnd + returnDuration;
-      let amount;
-
-      if (elapsed < morphEnd) {
-        amount = easeInOutCubic(elapsed / morphDuration);
-      } else if (elapsed < holdEnd) {
-        amount = 1;
-      } else if (elapsed < returnEnd) {
-        amount = 1 - easeInOutCubic((elapsed - holdEnd) / returnDuration);
-      } else {
-        restoreParticles();
-        return;
-      }
+      particles.particles.line_linked.distance = brainWidth * 0.16;
 
       brainParticles.forEach(function (particle, index) {
-        const original = originalStates[index];
-        const target = targets[index];
-        particle.x = mix(original.x, target.x, amount);
-        particle.y = mix(original.y, target.y, amount);
-        particle.radius = mix(original.radius, targetRadius, amount);
-        particle.opacity = mix(original.opacity, 0.78, amount);
+        const point = BRAIN_POINTS[index];
+        const phase = index * 0.73;
+        particle.x = centerX + ((point[0] - 0.5) / 0.8) * brainWidth
+          + Math.sin(time / 1100 + phase) * wobble;
+        particle.y = centerY + ((point[1] - 0.51) / 0.82) * brainHeight
+          + Math.cos(time / 1250 + phase) * wobble;
+        particle.radius = targetRadius;
+        particle.opacity = 0.72;
         particle.vx = 0;
         particle.vy = 0;
       });
 
+      particles.particles.array.slice(BRAIN_POINTS.length).forEach(function (particle) {
+        particle.radius = Math.min(particle.radius, 4.5 * ratioX);
+      });
+
       particles.fn.particlesDraw();
-      window.requestAnimationFrame(drawFrame);
+      window.requestAnimationFrame(drawBrain);
     }
 
-    window.requestAnimationFrame(drawFrame);
-  }
-
-  function enableBrainClicks(particles) {
-    const canvas = particles.canvas.el;
-    let clickCount = 0;
-
-    if (!document.querySelector(".particles-canvas-hint")) {
-      return;
-    }
-
-    canvas.addEventListener("click", function () {
-      if (particles.__brainAnimating) {
-        return;
-      }
-
-      clickCount += 1;
-      if (clickCount >= BRAIN_CLICK_COUNT) {
-        clickCount = 0;
-        animateBrainOutline(particles);
-      }
-    });
+    window.requestAnimationFrame(drawBrain);
   }
 
   function enableAppleEasterEgg() {
@@ -180,7 +111,7 @@
     document.body.appendChild(cursor);
 
     function moveCursor(event) {
-      cursor.style.transform = "translate3d(" + event.clientX + "px," + event.clientY + "px,0)";
+      cursor.style.transform = "translate3d(" + (event.clientX - 13) + "px," + (event.clientY - 8) + "px,0)";
     }
 
     function deactivate() {
@@ -222,7 +153,7 @@
       const particles = window.pJSDom && window.pJSDom[window.pJSDom.length - 1];
 
       if (particles && particles.pJS) {
-        enableBrainClicks(particles.pJS);
+        arrangeBrainOutline(particles.pJS);
       }
     });
   }, false);
