@@ -53,25 +53,21 @@
     function drawBrain(time) {
       const brainParticles = ensureBrainParticles();
       const canvasRect = particles.canvas.el.getBoundingClientRect();
-      const frameRect = frame.getBoundingClientRect();
       const ratioX = particles.canvas.w / canvasRect.width;
       const ratioY = particles.canvas.h / canvasRect.height;
-      const spaceAbove = Math.max(80, frameRect.top - canvasRect.top);
-      const brainWidth = Math.min(
-        frameRect.width,
-        canvasRect.width * 0.46,
-        spaceAbove * 1.15
-      ) * ratioX;
-      const brainHeight = brainWidth * 0.72;
-      const centerX = (frameRect.left + frameRect.width / 2 - canvasRect.left) * ratioX;
-      const centerY = Math.max(
-        brainHeight / 2 + 7 * ratioY,
-        (frameRect.top - canvasRect.top) * ratioY - brainHeight / 2 - 10 * ratioY
+      const brainWidthCss = Math.min(
+        920,
+        Math.max(canvasRect.width * 0.98, canvasRect.height * 0.86)
       );
-      const targetRadius = 2.35 * ratioX;
-      const wobble = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1.2 * ratioX;
+      const brainHeightCss = Math.min(canvasRect.height * 0.78, brainWidthCss * 0.70);
+      const brainWidth = brainWidthCss * ratioX;
+      const brainHeight = brainHeightCss * ratioY;
+      const centerX = particles.canvas.w * 0.5;
+      const centerY = particles.canvas.h * 0.43;
+      const wobble = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1.7 * ratioX;
 
-      particles.particles.line_linked.distance = brainWidth * 0.16;
+      particles.particles.line_linked.distance = brainWidth * 0.095;
+      particles.particles.line_linked.opacity = 0.34;
 
       brainParticles.forEach(function (particle, index) {
         const point = BRAIN_POINTS[index];
@@ -80,8 +76,8 @@
           + Math.sin(time / 1100 + phase) * wobble;
         particle.y = centerY + ((point[1] - 0.51) / 0.82) * brainHeight
           + Math.cos(time / 1250 + phase) * wobble;
-        particle.radius = targetRadius;
-        particle.opacity = 0.72;
+        particle.radius = (index < 29 ? 2.35 : 2.8) * ratioX;
+        particle.opacity = index < 29 ? 0.55 : 0.72;
         particle.vx = 0;
         particle.vy = 0;
       });
@@ -105,18 +101,17 @@
     }
 
     const cursor = document.createElement("span");
-    let timeout = null;
+    let active = false;
     cursor.className = "classic-mac-pointer";
     cursor.setAttribute("aria-hidden", "true");
     document.body.appendChild(cursor);
 
     function moveCursor(event) {
-      cursor.style.transform = "translate3d(" + (event.clientX - 13) + "px," + (event.clientY - 8) + "px,0)";
+      cursor.style.transform = "translate3d(" + (event.clientX - 20) + "px," + (event.clientY - 12) + "px,0)";
     }
 
     function deactivate() {
-      window.clearTimeout(timeout);
-      timeout = null;
+      active = false;
       document.documentElement.classList.remove("classic-mac-cursor");
       trigger.classList.remove("is-active");
       trigger.setAttribute("aria-pressed", "false");
@@ -125,18 +120,18 @@
     }
 
     function activate(event) {
-      if (timeout) {
-        deactivate();
+      moveCursor(event);
+
+      if (active) {
         return;
       }
 
-      moveCursor(event);
+      active = true;
       document.documentElement.classList.add("classic-mac-cursor");
       trigger.classList.add("is-active");
       trigger.setAttribute("aria-pressed", "true");
       cursor.classList.add("is-visible");
       window.addEventListener("pointermove", moveCursor);
-      timeout = window.setTimeout(deactivate, 7000);
     }
 
     trigger.addEventListener("click", activate);

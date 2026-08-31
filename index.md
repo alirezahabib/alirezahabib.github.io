@@ -85,7 +85,7 @@ where I keep the photos I take.
   </ol>
 </section>
 
-Outside the lab, I enjoy movies, video games, swimming, photography, and coding. You can find my movie ratings on [IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"} and my game collection on [Notion](https://alirezahabib.notion.site/9225b5de29be823fa24d01109ea9bc77){:target="_blank"}. I have a soft spot for all things <button class="apple-easter-trigger" type="button" aria-label="Activate a classic Macintosh cursor" aria-pressed="false">Apple</button>. I volunteer with the Los Angeles Regional Food Bank, Science Olympiad, and USC's student mentoring program. I also spent a few years contributing to Persian Wikipedia.
+Outside the lab, I enjoy movies, video games, swimming, photography, and coding. You can find my movie ratings on [IMDb](https://www.imdb.com/user/ur56527251){:target="_blank"} and my game collection on [Notion](https://alirezahabib.notion.site/9225b5de29be823fa24d01109ea9bc77){:target="_blank"}. I have a soft spot for all things <button class="apple-easter-trigger" type="button" aria-label="Activate a classic Macintosh cursor" aria-pressed="false">Apple</button>. I volunteer with the Los Angeles Regional Food Bank, Science Olympiad, and USC's student mentoring program. I edited Persian Wikipedia for a few years, but I've retired from that hobby.
 
 {% include contact.html %}
 
