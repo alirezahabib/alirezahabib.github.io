@@ -520,7 +520,6 @@
       const icon = icons[dragging.index];
       const releasedDrag = dragging;
       icon.classList.remove("is-dragging");
-      icon.closest(".roadmap-stop").classList.remove("is-dragging-stop");
       icon.setAttribute("aria-grabbed", "false");
       dragging = null;
       nodes.forEach(function (node) {
@@ -570,7 +569,6 @@
         };
         icon.setPointerCapture(event.pointerId);
         icon.classList.add("is-dragging");
-        icon.closest(".roadmap-stop").classList.add("is-dragging-stop");
         icon.setAttribute("aria-grabbed", "true");
         startAnimation();
       });

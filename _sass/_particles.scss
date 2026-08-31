@@ -45,7 +45,7 @@
   object-position: center;
   border-radius: 0;
   margin: 0;
-  transform: scale(1.22);
+  transform: scale(1.26);
   transform-origin: 52% 56%;
 }
 
@@ -126,22 +126,24 @@
   }
 }
 
-.particles-scroll-hint {
+.particles-canvas-hint {
   position: absolute;
-  right: 2.2rem;
-  top: -0.85rem;
+  z-index: 2;
+  top: 68%;
+  right: clamp(1rem, 7vw, 6rem);
   color: var(--color-particles-text);
   font-family: var(--type-serif);
   font-size: 0.78rem;
   font-style: italic;
   white-space: nowrap;
   opacity: 0.82;
+  pointer-events: none;
 
-  &::after {
-    content: "↘";
+  &::before {
+    content: "↖";
     display: inline-block;
-    margin-left: 0.2rem;
+    margin-right: 0.25rem;
     font-size: 1.05rem;
-    transform: rotate(-8deg);
+    transform: rotate(7deg);
   }
 }
