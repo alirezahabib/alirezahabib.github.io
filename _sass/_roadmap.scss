@@ -39,6 +39,10 @@
   align-items: stretch;
   margin: 0;
 
+  &.is-dragging-stop {
+    z-index: 6;
+  }
+
   &:nth-of-type(even) .roadmap-doodle {
     --doodle-rotation: 1.8deg;
   }
@@ -152,8 +156,8 @@ html[data-theme="dark"] .roadmap-doodle-imprint {
 
 .medal-doodle {
   --medal-ribbon: #74c0fc;
-  width: 3.45rem;
-  height: 3.45rem;
+  width: 3.2rem;
+  height: 3.2rem;
   border-radius: 50% 48% 52% 46%;
   background: #ced4da;
   color: #343a40;
@@ -163,20 +167,20 @@ html[data-theme="dark"] .roadmap-doodle-imprint {
     content: "";
     position: absolute;
     z-index: -1;
-    top: -1.05rem;
-    width: 1rem;
-    height: 1.6rem;
+    top: -0.95rem;
+    width: 0.92rem;
+    height: 1.45rem;
     border: 2px solid var(--color-text);
     background: var(--medal-ribbon);
   }
 
   &::before {
-    left: 0.45rem;
+    left: 0.42rem;
     transform: rotate(-12deg);
   }
 
   &::after {
-    right: 0.45rem;
+    right: 0.42rem;
     transform: rotate(12deg);
   }
 
@@ -226,8 +230,8 @@ html[data-theme="dark"] .campus-doodle img {
 }
 
 .swiss-flag {
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 2.9rem;
+  height: 2.9rem;
   background: #e03131;
 
   &::before,
@@ -242,13 +246,13 @@ html[data-theme="dark"] .campus-doodle img {
   }
 
   &::before {
-    width: 1.7rem;
-    height: 0.56rem;
+    width: 1.82rem;
+    height: 0.6rem;
   }
 
   &::after {
-    width: 0.56rem;
-    height: 1.7rem;
+    width: 0.6rem;
+    height: 1.82rem;
   }
 }
 
@@ -321,6 +325,7 @@ html[data-theme="dark"] .campus-doodle img {
 @media screen and (max-width: 520px) {
   .academic-roadmap {
     margin-top: 3rem;
+    margin-bottom: 4.25rem;
   }
 
   .roadmap-stop {
@@ -339,14 +344,14 @@ html[data-theme="dark"] .campus-doodle img {
   }
 
   .medal-doodle {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.55rem;
+    height: 2.55rem;
 
     &::before,
     &::after {
-      top: -0.8rem;
-      width: 0.75rem;
-      height: 1.2rem;
+      top: -0.74rem;
+      width: 0.68rem;
+      height: 1.08rem;
     }
   }
 
@@ -372,8 +377,18 @@ html[data-theme="dark"] .campus-doodle img {
   }
 
   .swiss-flag {
-    width: 2.15rem;
-    height: 2.15rem;
+    width: 2.45rem;
+    height: 2.45rem;
+
+    &::before {
+      width: 1.55rem;
+      height: 0.51rem;
+    }
+
+    &::after {
+      width: 0.51rem;
+      height: 1.55rem;
+    }
   }
 
   .campus-doodle {

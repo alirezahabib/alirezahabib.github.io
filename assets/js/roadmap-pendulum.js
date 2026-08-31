@@ -256,7 +256,7 @@
 
       // The campus artwork has transparent corners inside its rectangular SVG.
       // Let the rod continue behind it so it meets the drawn building at any angle.
-      return node.index === 1 ? boundary * 0.58 : boundary;
+      return node.index === 2 ? boundary * 0.58 : boundary;
     }
 
     function drawHint() {
@@ -315,14 +315,14 @@
         const bottomX = target.restX;
         const bottomY = target.restY + target.halfHeight + 8;
         const labelX = Math.max(8, Math.min(width - 68, bottomX - 27));
-        const labelY = bottomY + 70;
+        const labelY = bottomY + 66;
 
         context.fillText("drag me!", labelX, labelY);
         context.beginPath();
-        context.moveTo(labelX + 36, labelY - 13);
-        context.bezierCurveTo(labelX + 67, labelY - 30, labelX + 40, labelY - 62, labelX + 15, labelY - 43);
-        context.bezierCurveTo(labelX - 9, labelY - 24, labelX + 20, labelY - 10, labelX + 34, labelY - 35);
-        context.bezierCurveTo(labelX + 48, labelY - 59, bottomX, bottomY + 23, bottomX, bottomY);
+        context.moveTo(labelX + 38, labelY - 11);
+        context.bezierCurveTo(labelX + 60, labelY - 26, labelX + 48, labelY - 51, labelX + 27, labelY - 45);
+        context.bezierCurveTo(labelX + 6, labelY - 39, labelX + 12, labelY - 18, labelX + 32, labelY - 27);
+        context.bezierCurveTo(labelX + 49, labelY - 36, bottomX + 10, bottomY + 20, bottomX, bottomY);
         context.stroke();
         drawArrowhead(bottomX, bottomY, 0, -1);
       }
@@ -520,6 +520,7 @@
       const icon = icons[dragging.index];
       const releasedDrag = dragging;
       icon.classList.remove("is-dragging");
+      icon.closest(".roadmap-stop").classList.remove("is-dragging-stop");
       icon.setAttribute("aria-grabbed", "false");
       dragging = null;
       nodes.forEach(function (node) {
@@ -569,6 +570,7 @@
         };
         icon.setPointerCapture(event.pointerId);
         icon.classList.add("is-dragging");
+        icon.closest(".roadmap-stop").classList.add("is-dragging-stop");
         icon.setAttribute("aria-grabbed", "true");
         startAnimation();
       });

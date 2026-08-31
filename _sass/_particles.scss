@@ -45,7 +45,7 @@
   object-position: center;
   border-radius: 0;
   margin: 0;
-  transform: scale(1.18);
+  transform: scale(1.22);
   transform-origin: 52% 56%;
 }
 
@@ -123,5 +123,25 @@
   svg {
     -webkit-transform: scale(2.7);
     transform: scale(2.7);
+  }
+}
+
+.particles-scroll-hint {
+  position: absolute;
+  right: 2.2rem;
+  top: -0.85rem;
+  color: var(--color-particles-text);
+  font-family: var(--type-serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  white-space: nowrap;
+  opacity: 0.82;
+
+  &::after {
+    content: "↘";
+    display: inline-block;
+    margin-left: 0.2rem;
+    font-size: 1.05rem;
+    transform: rotate(-8deg);
   }
 }
