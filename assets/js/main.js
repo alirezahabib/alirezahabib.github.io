@@ -30,67 +30,92 @@
       return;
     }
 
-    particles.particles.number.value = BRAIN_POINTS.length;
+    const minimumParticleCount = BRAIN_POINTS.length + 12;
+    const missingCount = Math.max(0, minimumParticleCount - particles.particles.array.length);
+    const canvas = particles.canvas.el;
+
+    particles.particles.move.enable = true;
+    particles.particles.move.speed = 1.35 * (particles.canvas.pxratio || 1);
+    particles.particles.line_linked.opacity = 0.46;
     particles.particles.number.density.enable = false;
-    particles.particles.move.enable = false;
 
-    function ensureBrainParticles() {
-      const particleArray = particles.particles.array;
-      const missingCount = Math.max(0, BRAIN_POINTS.length - particleArray.length);
-
-      if (missingCount) {
-        particles.fn.modes.pushParticles(missingCount);
-      }
-
-      if (!particles.__brainReady && particles.particles.array.length > BRAIN_POINTS.length) {
-        particles.particles.array.splice(BRAIN_POINTS.length);
-      }
-
-      particles.__brainReady = true;
-      return particles.particles.array.slice(0, BRAIN_POINTS.length);
+    if (missingCount) {
+      particles.fn.modes.pushParticles(missingCount);
     }
 
-    function drawBrain(time) {
-      const brainParticles = ensureBrainParticles();
+    function brainGeometry() {
       const canvasRect = particles.canvas.el.getBoundingClientRect();
       const ratioX = particles.canvas.w / canvasRect.width;
       const ratioY = particles.canvas.h / canvasRect.height;
       const brainWidthCss = Math.min(
-        920,
-        Math.max(canvasRect.width * 0.98, canvasRect.height * 0.86)
+        1400,
+        canvasRect.width * 1.22,
+        Math.max(canvasRect.width * 1.18, canvasRect.height * 0.92)
       );
-      const brainHeightCss = Math.min(canvasRect.height * 0.78, brainWidthCss * 0.70);
-      const brainWidth = brainWidthCss * ratioX;
-      const brainHeight = brainHeightCss * ratioY;
-      const centerX = particles.canvas.w * 0.5;
-      const centerY = particles.canvas.h * 0.43;
-      const wobble = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1.7 * ratioX;
+      const brainHeightCss = Math.min(canvasRect.height * 0.86, brainWidthCss * 0.72);
 
-      particles.particles.line_linked.distance = brainWidth * 0.095;
-      particles.particles.line_linked.opacity = 0.34;
-
-      brainParticles.forEach(function (particle, index) {
-        const point = BRAIN_POINTS[index];
-        const phase = index * 0.73;
-        particle.x = centerX + ((point[0] - 0.5) / 0.8) * brainWidth
-          + Math.sin(time / 1100 + phase) * wobble;
-        particle.y = centerY + ((point[1] - 0.51) / 0.82) * brainHeight
-          + Math.cos(time / 1250 + phase) * wobble;
-        particle.radius = (index < 29 ? 2.35 : 2.8) * ratioX;
-        particle.opacity = index < 29 ? 0.55 : 0.72;
-        particle.vx = 0;
-        particle.vy = 0;
-      });
-
-      particles.particles.array.slice(BRAIN_POINTS.length).forEach(function (particle) {
-        particle.radius = Math.min(particle.radius, 4.5 * ratioX);
-      });
-
-      particles.fn.particlesDraw();
-      window.requestAnimationFrame(drawBrain);
+      return {
+        width: brainWidthCss * ratioX,
+        height: brainHeightCss * ratioY,
+        centerX: particles.canvas.w * 0.5,
+        centerY: particles.canvas.h * 0.43,
+        ratioX: ratioX
+      };
     }
 
-    window.requestAnimationFrame(drawBrain);
+    function brainTarget(index, geometry) {
+      const point = BRAIN_POINTS[index];
+      return {
+        x: geometry.centerX + (point[0] - 0.5) * geometry.width,
+        y: geometry.centerY + (point[1] - 0.51) * geometry.height
+      };
+    }
+
+    const initialGeometry = brainGeometry();
+    const brainParticles = particles.particles.array.slice(0, BRAIN_POINTS.length);
+
+    brainParticles.forEach(function (particle, index) {
+      const target = brainTarget(index, initialGeometry);
+      particle.x = target.x;
+      particle.y = target.y;
+      particle.vx = (Math.random() - 0.5) * 1.2;
+      particle.vy = (Math.random() - 0.5) * 1.2;
+      particle.vx_i = particle.vx;
+      particle.vy_i = particle.vy;
+    });
+
+    particles.interactivity.events.onclick.enable = false;
+    canvas.addEventListener("click", function (event) {
+      const canvasRect = canvas.getBoundingClientRect();
+      const ratioX = particles.canvas.w / canvasRect.width;
+      const ratioY = particles.canvas.h / canvasRect.height;
+      particles.fn.modes.pushParticles(4, {
+        pos_x: (event.clientX - canvasRect.left) * ratioX,
+        pos_y: (event.clientY - canvasRect.top) * ratioY
+      });
+    });
+
+    function keepBrainLoose(time) {
+      const geometry = brainGeometry();
+      const spring = 0.00042;
+      const damping = 0.9994;
+
+      particles.particles.line_linked.distance = Math.min(220, Math.max(175, canvas.getBoundingClientRect().width * 0.44))
+        * geometry.ratioX;
+
+      brainParticles.forEach(function (particle, index) {
+        const target = brainTarget(index, geometry);
+        const phase = index * 0.61;
+        target.x += Math.sin(time / 1800 + phase) * 7 * geometry.ratioX;
+        target.y += Math.cos(time / 2100 + phase) * 5 * geometry.ratioX;
+        particle.vx = (particle.vx + (target.x - particle.x) * spring) * damping;
+        particle.vy = (particle.vy + (target.y - particle.y) * spring) * damping;
+      });
+
+      window.requestAnimationFrame(keepBrainLoose);
+    }
+
+    window.requestAnimationFrame(keepBrainLoose);
   }
 
   function enableAppleEasterEgg() {
@@ -107,7 +132,7 @@
     document.body.appendChild(cursor);
 
     function moveCursor(event) {
-      cursor.style.transform = "translate3d(" + (event.clientX - 20) + "px," + (event.clientY - 12) + "px,0)";
+      cursor.style.transform = "translate3d(" + (event.clientX - 23) + "px," + (event.clientY - 14) + "px,0)";
     }
 
     function deactivate() {
@@ -123,6 +148,7 @@
       moveCursor(event);
 
       if (active) {
+        deactivate();
         return;
       }
 
