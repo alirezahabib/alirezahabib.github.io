@@ -89,10 +89,15 @@
       const canvasRect = canvas.getBoundingClientRect();
       const ratioX = particles.canvas.w / canvasRect.width;
       const ratioY = particles.canvas.h / canvasRect.height;
+      const clickPosition = {
+        x: (event.clientX - canvasRect.left) * ratioX,
+        y: (event.clientY - canvasRect.top) * ratioY
+      };
       particles.fn.modes.pushParticles(4, {
-        pos_x: (event.clientX - canvasRect.left) * ratioX,
-        pos_y: (event.clientY - canvasRect.top) * ratioY
+        pos_x: clickPosition.x,
+        pos_y: clickPosition.y
       });
+      particles.__neuralStimulus = clickPosition;
     });
 
     function keepBrainLoose(time) {
@@ -116,6 +121,207 @@
     }
 
     window.requestAnimationFrame(keepBrainLoose);
+  }
+
+  function enableNeuralSpikes(particles) {
+    const originalParticlesDraw = particles.fn.particlesDraw;
+    const activeSpikes = [];
+    const flashingNodes = new Map();
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const spikeColor = "116, 192, 252";
+    let nextSpontaneousFire = performance.now() + 450;
+
+    function distanceBetween(first, second) {
+      const deltaX = first.x - second.x;
+      const deltaY = first.y - second.y;
+      return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
+    function connectedNeighbors(node, previousNode) {
+      const connectionDistance = particles.particles.line_linked.distance * 0.96;
+      return particles.particles.array
+        .filter(function (candidate) {
+          return candidate !== node
+            && candidate !== previousNode
+            && distanceBetween(node, candidate) <= connectionDistance;
+        })
+        .sort(function (first, second) {
+          return distanceBetween(node, first) - distanceBetween(node, second);
+        })
+        .slice(0, 7);
+    }
+
+    function flashNode(node, time) {
+      flashingNodes.set(node, time);
+    }
+
+    function startSpike(from, to, previousNode, depth, time) {
+      if (!from || !to || activeSpikes.length >= 10) {
+        return;
+      }
+
+      activeSpikes.push({
+        from: from,
+        to: to,
+        previousNode: previousNode,
+        depth: depth,
+        startTime: time,
+        duration: 175 + Math.min(190, distanceBetween(from, to) * 0.72)
+      });
+    }
+
+    function propagateFrom(node, previousNode, depth, time) {
+      const neighbors = connectedNeighbors(node, previousNode);
+
+      flashNode(node, time);
+      if (!neighbors.length || depth >= (reducedMotion ? 2 : 4)) {
+        return;
+      }
+
+      const primaryIndex = Math.floor(Math.random() * Math.min(4, neighbors.length));
+      startSpike(node, neighbors[primaryIndex], previousNode, depth + 1, time);
+
+      if (!reducedMotion && depth < 2 && neighbors.length > 2 && Math.random() < 0.32) {
+        const branchCandidates = neighbors.filter(function (_, index) {
+          return index !== primaryIndex;
+        });
+        const branch = branchCandidates[Math.floor(Math.random() * branchCandidates.length)];
+        startSpike(node, branch, previousNode, depth + 1, time + 35);
+      }
+    }
+
+    function stimulateNearest(position, time) {
+      let nearestNode = null;
+      let nearestDistance = Infinity;
+
+      particles.particles.array.forEach(function (particle) {
+        const distance = Math.hypot(particle.x - position.x, particle.y - position.y);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestNode = particle;
+        }
+      });
+
+      if (nearestNode) {
+        propagateFrom(nearestNode, null, 0, time);
+      }
+    }
+
+    function fireSpontaneously(time) {
+      const particlesWithConnections = particles.particles.array.filter(function (particle) {
+        return connectedNeighbors(particle, null).length > 0;
+      });
+
+      if (particlesWithConnections.length) {
+        const neuron = particlesWithConnections[Math.floor(Math.random() * particlesWithConnections.length)];
+        propagateFrom(neuron, null, 0, time);
+      }
+
+      nextSpontaneousFire = time + (reducedMotion ? 2600 : 850 + Math.random() * 1050);
+    }
+
+    function drawTravelingSpike(context, spike, progress, pixelRatio) {
+      const trailProgress = Math.max(0, progress - 0.24);
+      const startX = spike.from.x + (spike.to.x - spike.from.x) * trailProgress;
+      const startY = spike.from.y + (spike.to.y - spike.from.y) * trailProgress;
+      const endX = spike.from.x + (spike.to.x - spike.from.x) * progress;
+      const endY = spike.from.y + (spike.to.y - spike.from.y) * progress;
+      const gradient = context.createLinearGradient(startX, startY, endX, endY);
+      const energy = Math.sin(progress * Math.PI) * 0.35 + 0.65;
+
+      gradient.addColorStop(0, "rgba(" + spikeColor + ", 0)");
+      gradient.addColorStop(0.58, "rgba(" + spikeColor + ", " + (0.38 * energy) + ")");
+      gradient.addColorStop(1, "rgba(241, 243, 245, " + (0.95 * energy) + ")");
+
+      context.strokeStyle = gradient;
+      context.lineWidth = 1.7 * pixelRatio;
+      context.lineCap = "round";
+      context.shadowColor = "rgba(" + spikeColor + ", 0.9)";
+      context.shadowBlur = 7 * pixelRatio;
+      context.beginPath();
+      context.moveTo(startX, startY);
+      context.lineTo(endX, endY);
+      context.stroke();
+
+      context.fillStyle = "rgba(241, 243, 245, 0.95)";
+      context.beginPath();
+      context.arc(endX, endY, 1.9 * pixelRatio, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    function drawNodeFlashes(context, time, pixelRatio) {
+      flashingNodes.forEach(function (startTime, node) {
+        const progress = (time - startTime) / 330;
+
+        if (progress >= 1) {
+          flashingNodes.delete(node);
+          return;
+        }
+
+        const energy = 1 - progress;
+        const pulseRadius = node.radius + (3 + progress * 8) * pixelRatio;
+        context.fillStyle = "rgba(241, 243, 245, " + (0.74 * energy) + ")";
+        context.shadowColor = "rgba(" + spikeColor + ", 0.95)";
+        context.shadowBlur = 12 * pixelRatio * energy;
+        context.beginPath();
+        context.arc(node.x, node.y, Math.max(node.radius, 2.2 * pixelRatio), 0, Math.PI * 2);
+        context.fill();
+
+        context.strokeStyle = "rgba(" + spikeColor + ", " + (0.48 * energy) + ")";
+        context.lineWidth = 1.15 * pixelRatio;
+        context.beginPath();
+        context.arc(node.x, node.y, pulseRadius, 0, Math.PI * 2);
+        context.stroke();
+      });
+    }
+
+    function drawNeuralActivity() {
+      const time = performance.now();
+      const context = particles.canvas.ctx;
+      const pixelRatio = particles.canvas.pxratio || 1;
+      const survivingSpikes = [];
+      const arrivals = [];
+
+      if (particles.__neuralStimulus) {
+        stimulateNearest(particles.__neuralStimulus, time);
+        particles.__neuralStimulus = null;
+      }
+
+      if (!document.hidden && time >= nextSpontaneousFire && activeSpikes.length < 6) {
+        fireSpontaneously(time);
+      }
+
+      context.save();
+      context.globalCompositeOperation = "lighter";
+
+      activeSpikes.forEach(function (spike) {
+        const progress = (time - spike.startTime) / spike.duration;
+
+        if (progress >= 1) {
+          arrivals.push(spike);
+          return;
+        }
+
+        if (progress >= 0) {
+          drawTravelingSpike(context, spike, progress, pixelRatio);
+        }
+        survivingSpikes.push(spike);
+      });
+
+      activeSpikes.length = 0;
+      Array.prototype.push.apply(activeSpikes, survivingSpikes);
+      arrivals.forEach(function (spike) {
+        propagateFrom(spike.to, spike.from, spike.depth, time);
+      });
+
+      drawNodeFlashes(context, time, pixelRatio);
+      context.restore();
+    }
+
+    particles.fn.particlesDraw = function () {
+      originalParticlesDraw();
+      drawNeuralActivity();
+    };
   }
 
   function enableAppleEasterEgg() {
@@ -175,6 +381,7 @@
 
       if (particles && particles.pJS) {
         arrangeBrainOutline(particles.pJS);
+        enableNeuralSpikes(particles.pJS);
       }
     });
   }, false);
