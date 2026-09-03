@@ -432,11 +432,15 @@
     }
 
     function screenOrientationAngle() {
+      if (typeof window.orientation === "number") {
+        return window.orientation;
+      }
+
       if (window.screen.orientation && typeof window.screen.orientation.angle === "number") {
         return window.screen.orientation.angle;
       }
 
-      return typeof window.orientation === "number" ? window.orientation : 0;
+      return 0;
     }
 
     function applyDeviceOrientation(event) {
