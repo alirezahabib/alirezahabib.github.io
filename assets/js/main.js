@@ -3,6 +3,13 @@
 
   function enhanceParticleField(particles) {
     const canvas = particles.canvas.el;
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    const particleLimit = coarsePointer ? 72 : 120;
+
+    particles.particles.number.density.enable = false;
+    if (particles.particles.array.length > particleLimit) {
+      particles.particles.array.splice(particleLimit);
+    }
 
     particles.interactivity.events.onclick.enable = false;
     canvas.addEventListener("click", function (event) {
@@ -13,10 +20,14 @@
         x: (event.clientX - canvasRect.left) * ratioX,
         y: (event.clientY - canvasRect.top) * ratioY
       };
-      particles.fn.modes.pushParticles(4, {
-        pos_x: clickPosition.x,
-        pos_y: clickPosition.y
-      });
+      const availableParticleSlots = particleLimit - particles.particles.array.length;
+
+      if (availableParticleSlots > 0) {
+        particles.fn.modes.pushParticles(Math.min(4, availableParticleSlots), {
+          pos_x: clickPosition.x,
+          pos_y: clickPosition.y
+        });
+      }
       particles.__neuralStimulus = clickPosition;
     });
   }
@@ -27,13 +38,20 @@
     const flashingNodes = new Map();
     const neuronStates = new Map();
     const plasticConnections = new Map();
+    let visiblePlasticConnections = [];
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const spikeColor = "116, 192, 252";
     const restingTransmissionProbability = reducedMotion ? 0.2 : 0.3;
-    const maximumActiveSpikes = reducedMotion ? 9 : 30;
+    const maximumActiveSpikes = reducedMotion ? 7 : 18;
+    const maximumPlasticConnections = reducedMotion ? 24 : 48;
+    const maximumVisibleConnections = reducedMotion ? 12 : 24;
     const cofireWindow = 360;
+    const frameInterval = 1000 / 30;
     let nextNeuronId = 1;
     let lastStateUpdate = performance.now();
+    let lastPlasticUpdate = 0;
+    let lastRenderedFrame = 0;
+    let fieldIsVisible = true;
     let networkBurst = null;
     let quietUntil = 0;
     let nextSpontaneousFire = performance.now() + 650;
@@ -46,16 +64,41 @@
 
     function connectedNeighbors(node, previousNode) {
       const connectionDistance = particles.particles.line_linked.distance * 0.96;
-      return particles.particles.array
-        .filter(function (candidate) {
-          return candidate !== node
-            && candidate !== previousNode
-            && distanceBetween(node, candidate) <= connectionDistance;
-        })
-        .sort(function (first, second) {
-          return distanceBetween(node, first) - distanceBetween(node, second);
-        })
-        .slice(0, 7);
+      const squaredConnectionDistance = connectionDistance * connectionDistance;
+      const nearest = [];
+
+      particles.particles.array.forEach(function (candidate) {
+        if (candidate === node || candidate === previousNode) {
+          return;
+        }
+
+        const deltaX = node.x - candidate.x;
+        const deltaY = node.y - candidate.y;
+        const squaredDistance = deltaX * deltaX + deltaY * deltaY;
+
+        if (squaredDistance > squaredConnectionDistance) {
+          return;
+        }
+
+        const insertionIndex = nearest.findIndex(function (entry) {
+          return squaredDistance < entry.squaredDistance;
+        });
+        const entry = { node: candidate, squaredDistance: squaredDistance };
+
+        if (insertionIndex === -1) {
+          nearest.push(entry);
+        } else {
+          nearest.splice(insertionIndex, 0, entry);
+        }
+
+        if (nearest.length > 7) {
+          nearest.pop();
+        }
+      });
+
+      return nearest.map(function (entry) {
+        return entry.node;
+      });
     }
 
     function neuronState(node) {
@@ -106,6 +149,23 @@
         1,
         connection.strength + 0.1 + synchrony * 0.16
       );
+
+      if (plasticConnections.size > maximumPlasticConnections) {
+        let weakestKey = null;
+        let weakestStrength = Infinity;
+
+        plasticConnections.forEach(function (candidate, candidateKey) {
+          decayConnection(candidate, time);
+          if (candidate.strength < weakestStrength) {
+            weakestStrength = candidate.strength;
+            weakestKey = candidateKey;
+          }
+        });
+
+        if (weakestKey) {
+          plasticConnections.delete(weakestKey);
+        }
+      }
     }
 
     function connectionStrength(first, second, time) {
@@ -130,6 +190,13 @@
     }
 
     function flashNode(node, time, intensity) {
+      if (!flashingNodes.has(node) && flashingNodes.size >= 18) {
+        flashingNodes.delete(flashingNodes.keys().next().value);
+      }
+
+      if (flashingNodes.has(node)) {
+        flashingNodes.delete(node);
+      }
       flashingNodes.set(node, {
         startTime: time,
         intensity: intensity
@@ -238,12 +305,13 @@
     }
 
     function connectedNeuron() {
-      const particlesWithConnections = particles.particles.array.filter(function (particle) {
-        return connectedNeighbors(particle, null).length > 0;
-      });
+      const neurons = particles.particles.array;
 
-      if (particlesWithConnections.length) {
-        return particlesWithConnections[Math.floor(Math.random() * particlesWithConnections.length)];
+      for (let attempt = 0; attempt < Math.min(12, neurons.length); attempt += 1) {
+        const neuron = neurons[Math.floor(Math.random() * neurons.length)];
+        if (connectedNeighbors(neuron, null).length > 0) {
+          return neuron;
+        }
       }
 
       return null;
@@ -303,6 +371,11 @@
     }
 
     function applyHebbianAttraction(time) {
+      if (time - lastPlasticUpdate < 80) {
+        return;
+      }
+
+      lastPlasticUpdate = time;
       const activeNeurons = new Set(particles.particles.array);
       const preferredDistance = particles.particles.line_linked.distance * 0.48;
       const maximumDistance = particles.particles.line_linked.distance * 1.25;
@@ -328,8 +401,8 @@
 
         const displacement = distance - preferredDistance;
         const shift = Math.max(
-          -0.055 * pixelRatio,
-          Math.min(0.055 * pixelRatio, displacement * 0.00055 * connection.strength)
+          -0.24 * pixelRatio,
+          Math.min(0.24 * pixelRatio, displacement * 0.0024 * connection.strength)
         );
         const unitX = deltaX / distance;
         const unitY = deltaY / distance;
@@ -339,12 +412,18 @@
         connection.second.x -= unitX * shift;
         connection.second.y -= unitY * shift;
       });
+
+      visiblePlasticConnections = Array.from(plasticConnections.values())
+        .sort(function (first, second) {
+          return second.strength - first.strength;
+        })
+        .slice(0, maximumVisibleConnections);
     }
 
     function drawStrengthenedConnections(context, pixelRatio) {
       const visibleDistance = particles.particles.line_linked.distance * 1.08;
 
-      plasticConnections.forEach(function (connection) {
+      visiblePlasticConnections.forEach(function (connection) {
         const distance = distanceBetween(connection.first, connection.second);
         const proximity = Math.max(0, 1 - distance / visibleDistance);
 
@@ -357,8 +436,6 @@
         context.strokeStyle = "rgba(" + spikeColor + ", " + opacity + ")";
         context.lineWidth = (0.45 + connection.strength * 1.15) * pixelRatio;
         context.lineCap = "round";
-        context.shadowColor = "rgba(" + spikeColor + ", " + (connection.strength * 0.62) + ")";
-        context.shadowBlur = 5 * pixelRatio * connection.strength;
         context.beginPath();
         context.moveTo(connection.first.x, connection.first.y);
         context.lineTo(connection.second.x, connection.second.y);
@@ -383,7 +460,7 @@
       context.lineWidth = 1.7 * pixelRatio;
       context.lineCap = "round";
       context.shadowColor = "rgba(" + spikeColor + ", 0.9)";
-      context.shadowBlur = 7 * pixelRatio;
+      context.shadowBlur = 5 * pixelRatio;
       context.beginPath();
       context.moveTo(startX, startY);
       context.lineTo(endX, endY);
@@ -408,7 +485,7 @@
         const pulseRadius = node.radius + (3 + progress * 8) * pixelRatio;
         context.fillStyle = "rgba(241, 243, 245, " + (0.74 * energy) + ")";
         context.shadowColor = "rgba(" + spikeColor + ", 0.95)";
-        context.shadowBlur = 12 * pixelRatio * energy;
+        context.shadowBlur = 8 * pixelRatio * energy;
         context.beginPath();
         context.arc(node.x, node.y, Math.max(node.radius, 2.2 * pixelRatio), 0, Math.PI * 2);
         context.fill();
@@ -485,10 +562,26 @@
     particles.fn.particlesDraw = function () {
       const time = performance.now();
 
+      if (document.hidden
+        || !fieldIsVisible
+        || time - lastRenderedFrame < frameInterval) {
+        return;
+      }
+
+      lastRenderedFrame = time;
       applyHebbianAttraction(time);
       originalParticlesDraw();
       drawNeuralActivity(time);
     };
+
+    particles.particles.move.speed *= 2;
+
+    if ("IntersectionObserver" in window) {
+      const visibilityObserver = new IntersectionObserver(function (entries) {
+        fieldIsVisible = entries[0].isIntersecting;
+      }, { threshold: 0.01 });
+      visibilityObserver.observe(particles.canvas.el);
+    }
   }
 
   function enableAppleEasterEgg() {
@@ -543,7 +636,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     enableAppleEasterEgg();
-    particlesJS.load("particles-js", "/assets/json/particles.json", function () {
+    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903d", function () {
       const particles = window.pJSDom && window.pJSDom[window.pJSDom.length - 1];
 
       if (particles && particles.pJS) {
