@@ -28,9 +28,12 @@
     const neuronStates = new Map();
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const spikeColor = "116, 192, 252";
-    const transmissionProbability = reducedMotion ? 0.32 : 0.47;
+    const restingTransmissionProbability = reducedMotion ? 0.2 : 0.3;
+    const maximumActiveSpikes = reducedMotion ? 9 : 30;
     let lastStateUpdate = performance.now();
-    let nextSpontaneousFire = performance.now() + 450;
+    let networkBurst = null;
+    let quietUntil = 0;
+    let nextSpontaneousFire = performance.now() + 650;
 
     function distanceBetween(first, second) {
       const deltaX = first.x - second.x;
@@ -55,8 +58,8 @@
     function neuronState(node) {
       if (!neuronStates.has(node)) {
         neuronStates.set(node, {
-          potential: Math.random() * 0.34,
-          threshold: 0.86 + Math.random() * 0.24,
+          potential: Math.random() * 0.24,
+          threshold: 0.82 + Math.random() * 0.24,
           refractoryUntil: 0
         });
       }
@@ -65,7 +68,7 @@
 
     function decayMembranePotentials(time) {
       const elapsed = Math.min(100, Math.max(0, time - lastStateUpdate));
-      const decay = Math.exp(-elapsed / 1450);
+      const decay = Math.exp(-elapsed / 1100);
 
       neuronStates.forEach(function (state) {
         state.potential *= decay;
@@ -81,7 +84,7 @@
     }
 
     function startSpike(from, to, time) {
-      if (!from || !to || activeSpikes.length >= 12) {
+      if (!from || !to || activeSpikes.length >= maximumActiveSpikes) {
         return;
       }
 
@@ -89,8 +92,18 @@
         from: from,
         to: to,
         startTime: time,
-        duration: 175 + Math.min(190, distanceBetween(from, to) * 0.72)
+        duration: 145 + Math.min(165, distanceBetween(from, to) * 0.62)
       });
+    }
+
+    function burstStrength(time) {
+      if (!networkBurst) {
+        return 0;
+      }
+
+      const progress = (time - networkBurst.startTime)
+        / (networkBurst.endTime - networkBurst.startTime);
+      return Math.max(0, Math.min(1, 1 - progress));
     }
 
     function fireNeuron(node, sourceNode, time) {
@@ -102,12 +115,20 @@
         return false;
       }
 
+      const strength = burstStrength(time);
+      const refractoryPeriod = strength > 0
+        ? 165 + Math.random() * 125
+        : 430 + Math.random() * 190;
+      const transmissionProbability = restingTransmissionProbability
+        + strength * (reducedMotion ? 0.16 : 0.38);
+
       state.potential = 0;
-      state.refractoryUntil = time + 520 + Math.random() * 240;
+      state.refractoryUntil = time + refractoryPeriod;
       flashNode(node, time, 1);
 
-      neighbors.forEach(function (neighbor) {
-        if (Math.random() < transmissionProbability) {
+      neighbors.forEach(function (neighbor, index) {
+        const distanceBias = 1 - index / (neighbors.length * 1.7);
+        if (Math.random() < transmissionProbability * distanceBias) {
           startSpike(node, neighbor, time + Math.random() * 45);
         }
       });
@@ -117,7 +138,7 @@
     function receiveSynapticInput(node, amount, sourceNode, time) {
       const state = neuronState(node);
 
-      if (time < state.refractoryUntil) {
+      if (time < state.refractoryUntil || (!networkBurst && time < quietUntil)) {
         return;
       }
 
@@ -140,24 +161,73 @@
       });
 
       if (nearestNode) {
-        const state = neuronState(nearestNode);
-        receiveSynapticInput(nearestNode, state.threshold + 0.08, null, time);
+        startNetworkBurst(nearestNode, time);
       }
     }
 
-    function fireSpontaneously(time) {
+    function connectedNeuron() {
       const particlesWithConnections = particles.particles.array.filter(function (particle) {
         return connectedNeighbors(particle, null).length > 0;
       });
 
       if (particlesWithConnections.length) {
-        const neuron = particlesWithConnections[Math.floor(Math.random() * particlesWithConnections.length)];
-        const state = neuronState(neuron);
-        receiveSynapticInput(neuron, state.threshold + 0.04, null, time);
+        return particlesWithConnections[Math.floor(Math.random() * particlesWithConnections.length)];
       }
 
-      const meanInterval = reducedMotion ? 2300 : 1050;
-      nextSpontaneousFire = time + 350 - Math.log(Math.max(0.001, Math.random())) * meanInterval;
+      return null;
+    }
+
+    function startNetworkBurst(origin, time) {
+      const seed = origin || connectedNeuron();
+
+      if (!seed) {
+        nextSpontaneousFire = time + 900;
+        return;
+      }
+
+      const nearbyPacemakers = connectedNeighbors(seed, null)
+        .slice(0, reducedMotion ? 1 : 2);
+      const duration = reducedMotion
+        ? 720
+        : 1250 + Math.random() * 850;
+
+      networkBurst = {
+        startTime: time,
+        endTime: time + duration,
+        pacemakers: [seed].concat(nearbyPacemakers),
+        nextPulseTime: time,
+        pulseIndex: 0
+      };
+      quietUntil = 0;
+    }
+
+    function pulseNetworkBurst(time) {
+      const pacemaker = networkBurst.pacemakers[
+        networkBurst.pulseIndex % networkBurst.pacemakers.length
+      ];
+      const state = neuronState(pacemaker);
+
+      receiveSynapticInput(pacemaker, state.threshold + 0.08, null, time);
+      networkBurst.pulseIndex += 1;
+      networkBurst.nextPulseTime = time + (reducedMotion
+        ? 320 + Math.random() * 120
+        : 95 + Math.random() * 105);
+    }
+
+    function finishNetworkBurst(time) {
+      networkBurst = null;
+      quietUntil = time + (reducedMotion
+        ? 4200 + Math.random() * 2200
+        : 2400 + Math.random() * 3300);
+      nextSpontaneousFire = quietUntil;
+    }
+
+    function fireSpontaneously(time) {
+      startNetworkBurst(null, time);
+
+      if (!networkBurst) {
+        nextSpontaneousFire = time + 900;
+      }
     }
 
     function drawTravelingSpike(context, spike, progress, pixelRatio) {
@@ -229,7 +299,17 @@
         particles.__neuralStimulus = null;
       }
 
-      if (!document.hidden && time >= nextSpontaneousFire && activeSpikes.length < 6) {
+      if (networkBurst && time >= networkBurst.endTime) {
+        finishNetworkBurst(time);
+      }
+
+      if (networkBurst
+        && time >= networkBurst.nextPulseTime
+        && activeSpikes.length < maximumActiveSpikes - 3) {
+        pulseNetworkBurst(time);
+      }
+
+      if (!document.hidden && !networkBurst && time >= nextSpontaneousFire) {
         fireSpontaneously(time);
       }
 
@@ -256,7 +336,7 @@
         flashNode(spike.to, time, 0.3);
         receiveSynapticInput(
           spike.to,
-          0.48 + Math.random() * 0.58,
+          (0.56 + Math.random() * 0.62) * (0.82 + burstStrength(time) * 0.3),
           spike.from,
           time
         );

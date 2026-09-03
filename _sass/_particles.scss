@@ -149,3 +149,9 @@
     transform: rotate(7deg);
   }
 }
+
+@media screen and (max-width: 520px) {
+  .particles-canvas-hint {
+    top: 75%;
+  }
+}
