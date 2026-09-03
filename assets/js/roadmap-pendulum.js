@@ -6,6 +6,7 @@
   const DAMPING = 1;
   const CONSTRAINT_PASSES = 18;
   const DRAG_CONSTRAINT_PASSES = 80;
+  const FRAME_INTERVAL = 1000 / 30;
 
   function initializeRoadmapPendulum() {
     const list = document.querySelector(".roadmap-list");
@@ -35,6 +36,7 @@
     let dragging = null;
     let frame = null;
     let previousTime = 0;
+    let previousRenderTime = 0;
     let accumulator = 0;
     let quietFrames = 0;
     let resizeTimer = null;
@@ -44,6 +46,15 @@
     let orientationPermissionRequested = false;
     let measuredLayoutWidth = document.documentElement.clientWidth;
     let hasUserInteracted = false;
+    let roadmapIsVisible = false;
+    let chainColor = "";
+    let linkColor = "";
+
+    function updateColors() {
+      const styles = getComputedStyle(list);
+      chainColor = styles.getPropertyValue("--color-text").trim();
+      linkColor = styles.getPropertyValue("--color-link").trim();
+    }
 
     function measure() {
       if (dragging) {
@@ -87,6 +98,7 @@
         return Math.hypot(node.x - previousNode.x, node.y - previousNode.y);
       });
 
+      updateColors();
       render();
       drawLinks();
     }
@@ -269,12 +281,11 @@
       const endY = target.restY;
       const startX = Math.max(18, endX - 132);
       const startY = endY - 62;
-      const textColor = getComputedStyle(list).getPropertyValue("--color-link").trim();
       const hasSideRoom = target.restX - target.halfWidth >= 165;
 
       context.save();
-      context.strokeStyle = textColor;
-      context.fillStyle = textColor;
+      context.strokeStyle = linkColor;
+      context.fillStyle = linkColor;
       context.globalAlpha = 0.82;
       context.lineWidth = 2;
       context.lineCap = "round";
@@ -360,7 +371,7 @@
       }
 
       context.save();
-      context.strokeStyle = getComputedStyle(list).getPropertyValue("--color-text").trim();
+      context.strokeStyle = chainColor;
       context.lineWidth = 2;
       context.lineCap = "round";
       context.setLineDash([6, 6]);
@@ -391,6 +402,20 @@
     }
 
     function animate(time) {
+      if (!roadmapIsVisible && !dragging) {
+        frame = null;
+        previousTime = 0;
+        previousRenderTime = 0;
+        accumulator = 0;
+        return;
+      }
+
+      if (previousRenderTime && time - previousRenderTime < FRAME_INTERVAL) {
+        frame = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      previousRenderTime = time;
       if (!previousTime) {
         previousTime = time;
       }
@@ -415,6 +440,7 @@
       if (quietFrames > 45 || (reducedMotion.matches && !dragging)) {
         frame = null;
         previousTime = 0;
+        previousRenderTime = 0;
         accumulator = 0;
         return;
       }
@@ -423,9 +449,14 @@
     }
 
     function startAnimation() {
+      if (!roadmapIsVisible && !dragging) {
+        return;
+      }
+
       quietFrames = 0;
       if (frame === null) {
         previousTime = 0;
+        previousRenderTime = 0;
         accumulator = 0;
         frame = window.requestAnimationFrame(animate);
       }
@@ -444,7 +475,9 @@
     }
 
     function applyDeviceOrientation(event) {
-      if (typeof event.beta !== "number" || typeof event.gamma !== "number") {
+      if (!roadmapIsVisible
+          || typeof event.beta !== "number"
+          || typeof event.gamma !== "number") {
         return;
       }
 
@@ -614,7 +647,10 @@
     window.addEventListener("pointerup", finishDrag);
     window.addEventListener("pointercancel", finishDrag);
 
-    const themeObserver = new MutationObserver(drawLinks);
+    const themeObserver = new MutationObserver(function () {
+      updateColors();
+      drawLinks();
+    });
     themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-theme"],
@@ -632,6 +668,26 @@
     });
 
     measure();
+    const roadmapRect = list.getBoundingClientRect();
+    roadmapIsVisible = roadmapRect.bottom > 0 && roadmapRect.top < window.innerHeight;
+
+    if ("IntersectionObserver" in window) {
+      const roadmapObserver = new IntersectionObserver(function (entries) {
+        roadmapIsVisible = entries[0].isIntersecting;
+
+        if (!roadmapIsVisible && frame !== null && !dragging) {
+          window.cancelAnimationFrame(frame);
+          frame = null;
+          previousTime = 0;
+          previousRenderTime = 0;
+          accumulator = 0;
+        } else if (roadmapIsVisible && hasUserInteracted) {
+          startAnimation();
+        }
+      }, { threshold: 0.01 });
+      roadmapObserver.observe(list);
+    }
+
     if (typeof window.DeviceOrientationEvent !== "undefined"
         && typeof window.DeviceOrientationEvent.requestPermission !== "function") {
       listenForDeviceOrientation();
