@@ -38,20 +38,15 @@
     const flashingNodes = new Map();
     const neuronStates = new Map();
     const plasticConnections = new Map();
-    let visiblePlasticConnections = [];
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const spikeColor = "116, 192, 252";
     const restingTransmissionProbability = reducedMotion ? 0.2 : 0.3;
     const maximumActiveSpikes = reducedMotion ? 6 : 14;
     const maximumPlasticConnections = reducedMotion ? 20 : 40;
-    const maximumVisibleConnections = reducedMotion ? 10 : 16;
     const cofireWindow = 360;
-    const activeFrameInterval = 1000 / 20;
-    const idleFrameInterval = 1000 / 12;
-    const baseMovementSpeed = particles.particles.move.speed;
+    const frameInterval = 1000 / 30;
     let nextNeuronId = 1;
     let lastStateUpdate = performance.now();
-    let lastPlasticUpdate = 0;
     let lastRenderedFrame = 0;
     let fieldIsVisible = true;
     let networkBurst = null;
@@ -372,60 +367,17 @@
       }
     }
 
-    function applyHebbianAttraction(time) {
-      if (time - lastPlasticUpdate < 120) {
-        return;
-      }
-
-      lastPlasticUpdate = time;
-      const activeNeurons = new Set(particles.particles.array);
-      const preferredDistance = particles.particles.line_linked.distance * 0.48;
-      const maximumDistance = particles.particles.line_linked.distance * 1.25;
-      const pixelRatio = particles.canvas.pxratio || 1;
+    function drawStrengthenedConnections(context, time, pixelRatio) {
+      const visibleDistance = particles.particles.line_linked.distance * 1.08;
 
       plasticConnections.forEach(function (connection, key) {
         decayConnection(connection, time);
 
-        if (connection.strength < 0.025
-          || !activeNeurons.has(connection.first)
-          || !activeNeurons.has(connection.second)) {
+        if (connection.strength < 0.025) {
           plasticConnections.delete(key);
           return;
         }
 
-        const deltaX = connection.second.x - connection.first.x;
-        const deltaY = connection.second.y - connection.first.y;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-        if (distance <= 0 || distance > maximumDistance || reducedMotion) {
-          return;
-        }
-
-        const displacement = distance - preferredDistance;
-        const shift = Math.max(
-          -0.24 * pixelRatio,
-          Math.min(0.24 * pixelRatio, displacement * 0.0024 * connection.strength)
-        );
-        const unitX = deltaX / distance;
-        const unitY = deltaY / distance;
-
-        connection.first.x += unitX * shift;
-        connection.first.y += unitY * shift;
-        connection.second.x -= unitX * shift;
-        connection.second.y -= unitY * shift;
-      });
-
-      visiblePlasticConnections = Array.from(plasticConnections.values())
-        .sort(function (first, second) {
-          return second.strength - first.strength;
-        })
-        .slice(0, maximumVisibleConnections);
-    }
-
-    function drawStrengthenedConnections(context, pixelRatio) {
-      const visibleDistance = particles.particles.line_linked.distance * 1.08;
-
-      visiblePlasticConnections.forEach(function (connection) {
         const distance = distanceBetween(connection.first, connection.second);
         const proximity = Math.max(0, 1 - distance / visibleDistance);
 
@@ -529,7 +481,7 @@
 
       context.save();
       context.globalCompositeOperation = "lighter";
-      drawStrengthenedConnections(context, pixelRatio);
+      drawStrengthenedConnections(context, time, pixelRatio);
 
       activeSpikes.forEach(function (spike) {
         const progress = (time - spike.startTime) / spike.duration;
@@ -563,12 +515,6 @@
 
     particles.fn.particlesDraw = function () {
       const time = performance.now();
-      const activityIsVisible = networkBurst
-        || activeSpikes.length > 0
-        || flashingNodes.size > 0;
-      const frameInterval = activityIsVisible
-        ? activeFrameInterval
-        : idleFrameInterval;
 
       if (document.hidden
         || !fieldIsVisible
@@ -577,12 +523,11 @@
       }
 
       lastRenderedFrame = time;
-      particles.particles.move.speed = baseMovementSpeed * 60
-        / (1000 / frameInterval);
-      applyHebbianAttraction(time);
       originalParticlesDraw();
       drawNeuralActivity(time);
     };
+
+    particles.particles.move.speed *= 2;
 
     if ("IntersectionObserver" in window) {
       const visibilityObserver = new IntersectionObserver(function (entries) {
@@ -644,7 +589,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     enableAppleEasterEgg();
-    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903h", function () {
+    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903i", function () {
       const particles = window.pJSDom && window.pJSDom[window.pJSDom.length - 1];
 
       if (particles && particles.pJS) {
