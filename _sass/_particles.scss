@@ -120,6 +120,7 @@
     position: relative;
     -webkit-animation: pulse 1s infinite;
     animation: pulse 1s infinite;
+    will-change: transform, opacity;
   }
 
   svg {

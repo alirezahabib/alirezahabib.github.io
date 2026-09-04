@@ -46,7 +46,9 @@
     const maximumPlasticConnections = reducedMotion ? 20 : 40;
     const maximumVisibleConnections = reducedMotion ? 10 : 16;
     const cofireWindow = 360;
-    const frameInterval = 1000 / 24;
+    const activeFrameInterval = 1000 / 24;
+    const idleFrameInterval = 1000 / 15;
+    const baseMovementSpeed = particles.particles.move.speed;
     let nextNeuronId = 1;
     let lastStateUpdate = performance.now();
     let lastPlasticUpdate = 0;
@@ -561,6 +563,12 @@
 
     particles.fn.particlesDraw = function () {
       const time = performance.now();
+      const activityIsVisible = networkBurst
+        || activeSpikes.length > 0
+        || flashingNodes.size > 0;
+      const frameInterval = activityIsVisible
+        ? activeFrameInterval
+        : idleFrameInterval;
 
       if (document.hidden
         || !fieldIsVisible
@@ -569,12 +577,12 @@
       }
 
       lastRenderedFrame = time;
+      particles.particles.move.speed = baseMovementSpeed * 60
+        / (1000 / frameInterval);
       applyHebbianAttraction(time);
       originalParticlesDraw();
       drawNeuralActivity(time);
     };
-
-    particles.particles.move.speed *= 2.5;
 
     if ("IntersectionObserver" in window) {
       const visibilityObserver = new IntersectionObserver(function (entries) {
@@ -636,7 +644,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     enableAppleEasterEgg();
-    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903d", function () {
+    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903g", function () {
       const particles = window.pJSDom && window.pJSDom[window.pJSDom.length - 1];
 
       if (particles && particles.pJS) {
