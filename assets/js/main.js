@@ -46,8 +46,8 @@
     const maximumPlasticConnections = reducedMotion ? 20 : 40;
     const maximumVisibleConnections = reducedMotion ? 10 : 16;
     const cofireWindow = 360;
-    const activeFrameInterval = 1000 / 24;
-    const idleFrameInterval = 1000 / 15;
+    const activeFrameInterval = 1000 / 20;
+    const idleFrameInterval = 1000 / 12;
     const baseMovementSpeed = particles.particles.move.speed;
     let nextNeuronId = 1;
     let lastStateUpdate = performance.now();
@@ -644,7 +644,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     enableAppleEasterEgg();
-    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903g", function () {
+    particlesJS.load("particles-js", "/assets/json/particles.json?v=20260903h", function () {
       const particles = window.pJSDom && window.pJSDom[window.pJSDom.length - 1];
 
       if (particles && particles.pJS) {
