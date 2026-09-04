@@ -4,7 +4,7 @@
   function enhanceParticleField(particles) {
     const canvas = particles.canvas.el;
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-    const particleLimit = coarsePointer ? 72 : 120;
+    const particleLimit = coarsePointer ? 64 : 96;
 
     particles.particles.number.density.enable = false;
     if (particles.particles.array.length > particleLimit) {
@@ -42,11 +42,11 @@
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const spikeColor = "116, 192, 252";
     const restingTransmissionProbability = reducedMotion ? 0.2 : 0.3;
-    const maximumActiveSpikes = reducedMotion ? 7 : 18;
-    const maximumPlasticConnections = reducedMotion ? 24 : 48;
-    const maximumVisibleConnections = reducedMotion ? 12 : 24;
+    const maximumActiveSpikes = reducedMotion ? 6 : 14;
+    const maximumPlasticConnections = reducedMotion ? 20 : 40;
+    const maximumVisibleConnections = reducedMotion ? 10 : 16;
     const cofireWindow = 360;
-    const frameInterval = 1000 / 30;
+    const frameInterval = 1000 / 24;
     let nextNeuronId = 1;
     let lastStateUpdate = performance.now();
     let lastPlasticUpdate = 0;
@@ -190,7 +190,7 @@
     }
 
     function flashNode(node, time, intensity) {
-      if (!flashingNodes.has(node) && flashingNodes.size >= 18) {
+      if (!flashingNodes.has(node) && flashingNodes.size >= 14) {
         flashingNodes.delete(flashingNodes.keys().next().value);
       }
 
@@ -371,7 +371,7 @@
     }
 
     function applyHebbianAttraction(time) {
-      if (time - lastPlasticUpdate < 80) {
+      if (time - lastPlasticUpdate < 120) {
         return;
       }
 
@@ -574,7 +574,7 @@
       drawNeuralActivity(time);
     };
 
-    particles.particles.move.speed *= 2;
+    particles.particles.move.speed *= 2.5;
 
     if ("IntersectionObserver" in window) {
       const visibilityObserver = new IntersectionObserver(function (entries) {

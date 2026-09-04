@@ -1,22 +1,22 @@
 @keyframes pulse {
   from {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
-    filter: alpha(opacity=40);
     opacity: .4;
-    top: 0;
+    transform: translateY(0);
   }
 
   50% {
-    -ms-filter: none;
-    filter: none;
     opacity: 1;
-    top: -1rem;
+    transform: translateY(-1rem);
   }
 
   to {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
-    filter: alpha(opacity=40);
     opacity: .4;
-    top: 0
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particles-scroll .particles-icon {
+    animation: none;
   }
 }
