@@ -40,11 +40,11 @@
   margin: 0;
 
   &:nth-of-type(even) .roadmap-doodle {
-    --doodle-rotation: 1.8deg;
+    --doodle-rotation: 2.3deg;
   }
 
   &:nth-of-type(odd) .roadmap-doodle {
-    --doodle-rotation: -1.5deg;
+    --doodle-rotation: -2deg;
   }
 
   &:nth-of-type(even) .roadmap-note {
