@@ -7,8 +7,6 @@
   const CONSTRAINT_PASSES = 18;
   const DRAG_CONSTRAINT_PASSES = 80;
   const FRAME_INTERVAL = 1000 / 30;
-  const SCROLL_INERTIA = 0.34;
-  const MAX_SCROLL_SHIFT = 28;
 
   function initializeRoadmapPendulum() {
     const list = document.querySelector(".roadmap-list");
@@ -51,7 +49,6 @@
     let roadmapIsVisible = false;
     let chainColor = "";
     let linkColor = "";
-    let lastScrollY = window.scrollY;
 
     function updateColors() {
       const styles = getComputedStyle(list);
@@ -465,35 +462,6 @@
       }
     }
 
-    function applyScrollInertia() {
-      const currentScrollY = window.scrollY;
-      const scrollDelta = currentScrollY - lastScrollY;
-      lastScrollY = currentScrollY;
-
-      if (!roadmapIsVisible
-          || dragging
-          || reducedMotion.matches
-          || Math.abs(scrollDelta) < 0.5) {
-        return;
-      }
-
-      const shift = Math.max(
-        -MAX_SCROLL_SHIFT,
-        Math.min(MAX_SCROLL_SHIFT, scrollDelta * SCROLL_INERTIA)
-      );
-
-      for (let index = 1; index < nodes.length; index += 1) {
-        nodes[index].y += shift;
-        nodes[index].previousY += shift;
-      }
-
-      solveConstraints();
-      hasUserInteracted = true;
-      render();
-      drawLinks();
-      startAnimation();
-    }
-
     function screenOrientationAngle() {
       if (typeof window.orientation === "number") {
         return window.orientation;
@@ -678,7 +646,6 @@
     window.addEventListener("pointermove", moveDraggedNode, { passive: false });
     window.addEventListener("pointerup", finishDrag);
     window.addEventListener("pointercancel", finishDrag);
-    window.addEventListener("scroll", applyScrollInertia, { passive: true });
 
     const themeObserver = new MutationObserver(function () {
       updateColors();
