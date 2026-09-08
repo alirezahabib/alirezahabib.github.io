@@ -130,21 +130,5 @@ a.reversefootnote {
 
 html.classic-mac-cursor,
 html.classic-mac-cursor * {
-  cursor: none !important;
-}
-
-.classic-mac-pointer {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  display: none;
-  width: 56px;
-  height: 56px;
-  background: url("/assets/svg/pointinghand.svg") center / contain no-repeat;
-  pointer-events: none;
-
-  &.is-visible {
-    display: block;
-  }
+  cursor: url("/assets/svg/pointinghand.svg?v=2") 23 14, pointer !important;
 }

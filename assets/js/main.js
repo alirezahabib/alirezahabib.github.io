@@ -544,28 +544,16 @@
       return;
     }
 
-    const cursor = document.createElement("span");
     let active = false;
-    cursor.className = "classic-mac-pointer";
-    cursor.setAttribute("aria-hidden", "true");
-    document.body.appendChild(cursor);
-
-    function moveCursor(event) {
-      cursor.style.transform = "translate3d(" + (event.clientX - 23) + "px," + (event.clientY - 14) + "px,0)";
-    }
 
     function deactivate() {
       active = false;
       document.documentElement.classList.remove("classic-mac-cursor");
       trigger.classList.remove("is-active");
       trigger.setAttribute("aria-pressed", "false");
-      cursor.classList.remove("is-visible");
-      window.removeEventListener("pointermove", moveCursor);
     }
 
-    function activate(event) {
-      moveCursor(event);
-
+    function activate() {
       if (active) {
         deactivate();
         return;
@@ -575,8 +563,6 @@
       document.documentElement.classList.add("classic-mac-cursor");
       trigger.classList.add("is-active");
       trigger.setAttribute("aria-pressed", "true");
-      cursor.classList.add("is-visible");
-      window.addEventListener("pointermove", moveCursor);
     }
 
     trigger.addEventListener("click", activate);
