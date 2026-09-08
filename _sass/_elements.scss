@@ -112,7 +112,7 @@ a.reversefootnote {
   font: inherit;
   line-height: inherit;
   vertical-align: baseline;
-  cursor: pointer;
+  cursor: none;
 
   &:focus,
   &:hover {
@@ -130,5 +130,22 @@ a.reversefootnote {
 
 html.classic-mac-cursor,
 html.classic-mac-cursor * {
-  cursor: url("/assets/pointinghand.png?v=1") 23 14, pointer !important;
+  cursor: none !important;
+}
+
+.classic-mac-pointer {
+  position: fixed;
+  z-index: 2147483647;
+  top: 0;
+  left: 0;
+  display: none;
+  width: 56px;
+  height: 56px;
+  background: url("/assets/svg/pointinghand.svg") center / contain no-repeat;
+  pointer-events: none;
+  will-change: transform;
+
+  &.is-visible {
+    display: block;
+  }
 }

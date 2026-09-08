@@ -544,27 +544,50 @@
       return;
     }
 
+    const cursor = document.createElement("span");
     let active = false;
+    cursor.className = "classic-mac-pointer";
+    cursor.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cursor);
+
+    function moveCursor(event) {
+      cursor.style.transform = "translate3d(" + (event.clientX - 23) + "px," + (event.clientY - 14) + "px,0)";
+      cursor.classList.add("is-visible");
+    }
 
     function deactivate() {
       active = false;
       document.documentElement.classList.remove("classic-mac-cursor");
       trigger.classList.remove("is-active");
       trigger.setAttribute("aria-pressed", "false");
+      window.removeEventListener("pointermove", moveCursor);
+
+      if (!trigger.matches(":hover")) {
+        cursor.classList.remove("is-visible");
+      }
     }
 
-    function activate() {
+    function activate(event) {
       if (active) {
         deactivate();
         return;
       }
 
+      moveCursor(event);
       active = true;
       document.documentElement.classList.add("classic-mac-cursor");
       trigger.classList.add("is-active");
       trigger.setAttribute("aria-pressed", "true");
+      window.addEventListener("pointermove", moveCursor, { passive: true });
     }
 
+    trigger.addEventListener("pointerenter", moveCursor, { passive: true });
+    trigger.addEventListener("pointermove", moveCursor, { passive: true });
+    trigger.addEventListener("pointerleave", function () {
+      if (!active) {
+        cursor.classList.remove("is-visible");
+      }
+    });
     trigger.addEventListener("click", activate);
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
