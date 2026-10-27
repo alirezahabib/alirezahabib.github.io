@@ -2,7 +2,7 @@
   <div class="jumbotron text-center">
     {% if site.photo %}
     <div class="particles-photo-frame">
-      <img class="particles-photo" src="{{ site.photo }}" alt="Portrait of Alireza Habib Zadeh"/>
+      <img class="particles-photo" src="{{ site.photo }}" alt="Portrait of {{ site.author.name }}"/>
     </div>
     {% endif %}
     <h1 class="particles-title">{% include display-name.html %}</h1>

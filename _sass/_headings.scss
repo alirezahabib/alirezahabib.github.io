@@ -12,12 +12,21 @@ h1,h2,h3 {
   }
 }
 
-.name-middle {
-  opacity: 0.65;
+.name-muted {
+  opacity: 0.5;
+}
+
+// The hyphen is decorative; the underlying surname stays joined.
+.name-hyphen::before {
+  content: "-";
+}
+
+.name-ending {
+  text-transform: capitalize;
 }
 
 @media print {
-  .name-middle {
+  .name-muted {
     opacity: 1;
   }
 }
