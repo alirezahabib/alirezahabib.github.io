@@ -24,7 +24,14 @@ function updateToggleIcon(activeTheme) {
   if (!toggle) {
     return;
   }
-  toggle.innerHTML = activeTheme === "dark" ? sun : moon;
+  const icon = toggle.querySelector("svg");
+  const markup = activeTheme === "dark" ? sun : moon;
+  // Keep the haptic label in place while Safari handles the original tap.
+  if (icon) {
+    icon.outerHTML = markup;
+  } else {
+    toggle.insertAdjacentHTML("afterbegin", markup);
+  }
 }
 
 function applyTheme(theme) {
@@ -38,6 +45,7 @@ function modeSwitcher() {
 
   localStorage.setItem(STORAGE_KEY, nextTheme);
   applyTheme(nextTheme);
+  window.siteHaptics.pulse(8);
 }
 
 systemInitiatedDark.addEventListener("change", function (event) {
@@ -48,3 +56,4 @@ systemInitiatedDark.addEventListener("change", function (event) {
 });
 
 applyTheme(resolveTheme());
+window.siteHaptics.attach(document.getElementById("theme-toggle"));

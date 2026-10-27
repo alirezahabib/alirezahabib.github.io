@@ -551,6 +551,7 @@
       return;
     }
 
+    window.siteHaptics.attach(trigger);
     const cursor = document.createElement("span");
     let active = false;
     cursor.className = "classic-mac-pointer";
@@ -575,6 +576,7 @@
     }
 
     function activate(event) {
+      window.siteHaptics.pulse(8);
       if (active) {
         deactivate();
         return;
