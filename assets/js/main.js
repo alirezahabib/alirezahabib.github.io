@@ -42,6 +42,7 @@
   function enableNeuralSpikes(particles) {
     const originalParticlesDraw = particles.fn.particlesDraw;
     const activeSpikes = [];
+    const arrivals = [];
     const flashingNodes = new Map();
     const neuronStates = new Map();
     const plasticConnections = new Map();
@@ -51,11 +52,15 @@
     const maximumActiveSpikes = reducedMotion ? 6 : 14;
     const maximumPlasticConnections = reducedMotion ? 20 : 40;
     const cofireWindow = 360;
-    const frameInterval = 1000 / 30;
+    const frameInterval = 1000 / 60;
+    const glowCanvas = document.createElement("canvas");
+    const glowContext = glowCanvas.getContext("2d");
     let nextNeuronId = 1;
     let lastStateUpdate = performance.now();
     let lastRenderedFrame = 0;
+    let lastMotionTime = 0;
     let fieldIsVisible = true;
+    let animationPaused = false;
     let networkBurst = null;
     let quietUntil = 0;
     let nextSpontaneousFire = performance.now() + 650;
@@ -404,12 +409,33 @@
       });
     }
 
+    // Reuse a small Retina-resolution surface for blur. Integer offsets preserve
+    // the original subpixel geometry; the image is copied without any scaling.
+    function prepareGlow(left, top, width, height) {
+      if (glowCanvas.width < width || glowCanvas.height < height) {
+        glowCanvas.width = Math.max(glowCanvas.width, Math.ceil(width / 32) * 32);
+        glowCanvas.height = Math.max(glowCanvas.height, Math.ceil(height / 32) * 32);
+      }
+      glowContext.setTransform(1, 0, 0, 1, 0, 0);
+      glowContext.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+      glowContext.translate(-left, -top);
+      glowContext.globalCompositeOperation = "lighter";
+      return glowContext;
+    }
+
     function drawTravelingSpike(context, spike, progress, pixelRatio) {
       const trailProgress = Math.max(0, progress - 0.24);
       const startX = spike.from.x + (spike.to.x - spike.from.x) * trailProgress;
       const startY = spike.from.y + (spike.to.y - spike.from.y) * trailProgress;
       const endX = spike.from.x + (spike.to.x - spike.from.x) * progress;
       const endY = spike.from.y + (spike.to.y - spike.from.y) * progress;
+      const padding = Math.ceil(12 * pixelRatio);
+      const left = Math.floor(Math.min(startX, endX)) - padding;
+      const top = Math.floor(Math.min(startY, endY)) - padding;
+      const width = Math.ceil(Math.max(startX, endX)) - left + padding;
+      const height = Math.ceil(Math.max(startY, endY)) - top + padding;
+      const destination = context;
+      context = prepareGlow(left, top, width, height);
       const gradient = context.createLinearGradient(startX, startY, endX, endY);
       const energy = Math.sin(progress * Math.PI) * 0.35 + 0.65;
 
@@ -431,6 +457,7 @@
       context.beginPath();
       context.arc(endX, endY, 1.9 * pixelRatio, 0, Math.PI * 2);
       context.fill();
+      destination.drawImage(glowCanvas, 0, 0, width, height, left, top, width, height);
     }
 
     function drawNodeFlashes(context, time, pixelRatio) {
@@ -444,26 +471,32 @@
 
         const energy = (1 - progress) * flash.intensity;
         const pulseRadius = node.radius + (3 + progress * 8) * pixelRatio;
-        context.fillStyle = "rgba(241, 243, 245, " + (0.74 * energy) + ")";
-        context.shadowColor = "rgba(" + spikeColor + ", 0.95)";
-        context.shadowBlur = 8 * pixelRatio * energy;
-        context.beginPath();
-        context.arc(node.x, node.y, Math.max(node.radius, 2.2 * pixelRatio), 0, Math.PI * 2);
-        context.fill();
+        const extent = pulseRadius + Math.ceil(18 * pixelRatio);
+        const left = Math.floor(node.x - extent);
+        const top = Math.floor(node.y - extent);
+        const width = Math.ceil(node.x + extent) - left;
+        const height = Math.ceil(node.y + extent) - top;
+        const glow = prepareGlow(left, top, width, height);
+        glow.fillStyle = "rgba(241, 243, 245, " + (0.74 * energy) + ")";
+        glow.shadowColor = "rgba(" + spikeColor + ", 0.95)";
+        glow.shadowBlur = 8 * pixelRatio * energy;
+        glow.beginPath();
+        glow.arc(node.x, node.y, Math.max(node.radius, 2.2 * pixelRatio), 0, Math.PI * 2);
+        glow.fill();
 
-        context.strokeStyle = "rgba(" + spikeColor + ", " + (0.48 * energy) + ")";
-        context.lineWidth = 1.15 * pixelRatio;
-        context.beginPath();
-        context.arc(node.x, node.y, pulseRadius, 0, Math.PI * 2);
-        context.stroke();
+        glow.strokeStyle = "rgba(" + spikeColor + ", " + (0.48 * energy) + ")";
+        glow.lineWidth = 1.15 * pixelRatio;
+        glow.beginPath();
+        glow.arc(node.x, node.y, pulseRadius, 0, Math.PI * 2);
+        glow.stroke();
+        context.drawImage(glowCanvas, 0, 0, width, height, left, top, width, height);
       });
     }
 
     function drawNeuralActivity(time) {
       const context = particles.canvas.ctx;
       const pixelRatio = particles.canvas.pxratio || 1;
-      const survivingSpikes = [];
-      const arrivals = [];
+      arrivals.length = 0;
 
       decayMembranePotentials(time);
 
@@ -490,6 +523,7 @@
       context.globalCompositeOperation = "lighter";
       drawStrengthenedConnections(context, time, pixelRatio);
 
+      let survivingCount = 0;
       activeSpikes.forEach(function (spike) {
         const progress = (time - spike.startTime) / spike.duration;
 
@@ -501,11 +535,11 @@
         if (progress >= 0) {
           drawTravelingSpike(context, spike, progress, pixelRatio);
         }
-        survivingSpikes.push(spike);
+        activeSpikes[survivingCount] = spike;
+        survivingCount += 1;
       });
 
-      activeSpikes.length = 0;
-      Array.prototype.push.apply(activeSpikes, survivingSpikes);
+      activeSpikes.length = survivingCount;
       arrivals.forEach(function (spike) {
         flashNode(spike.to, time, 0.3);
         receiveSynapticInput(
@@ -524,21 +558,49 @@
       const time = performance.now();
 
       if (document.hidden
-        || !fieldIsVisible
-        || time - lastRenderedFrame < frameInterval) {
+        || !fieldIsVisible) {
         return;
       }
 
-      lastRenderedFrame = time;
+      const elapsed = time - lastRenderedFrame;
+      if (lastRenderedFrame && elapsed < frameInterval - 0.5) {
+        return;
+      }
+
+      // Retain fractional frame time instead of losing it on each refresh.
+      lastRenderedFrame = lastRenderedFrame
+        ? lastRenderedFrame + Math.max(1, Math.floor((elapsed + 0.5) / frameInterval)) * frameInterval
+        : time;
+      const motionElapsed = lastMotionTime ? Math.min(time - lastMotionTime, 50) : frameInterval;
+      lastMotionTime = time;
+      const speed = particles.particles.move.speed;
+      particles.particles.move.speed = speed * motionElapsed / frameInterval;
       originalParticlesDraw();
+      particles.particles.move.speed = speed;
       drawNeuralActivity(time);
     };
 
-    particles.particles.move.speed *= 2;
+    function updateAnimationState() {
+      const paused = document.hidden || !fieldIsVisible;
+      if (paused === animationPaused) {
+        return;
+      }
 
+      animationPaused = paused;
+      lastRenderedFrame = 0;
+      lastMotionTime = 0;
+      if (paused) {
+        window.cancelAnimationFrame(particles.fn.drawAnimFrame);
+      } else {
+        particles.fn.vendors.draw();
+      }
+    }
+
+    document.addEventListener("visibilitychange", updateAnimationState);
     if ("IntersectionObserver" in window) {
       const visibilityObserver = new IntersectionObserver(function (entries) {
         fieldIsVisible = entries[0].isIntersecting;
+        updateAnimationState();
       }, { threshold: 0.01 });
       visibilityObserver.observe(particles.canvas.el);
     }
