@@ -161,7 +161,7 @@
         return;
       }
 
-      if (event.cancelable) {
+      if (event.cancelable && !dragging.hapticTarget) {
         event.preventDefault();
       }
 
@@ -179,6 +179,15 @@
       const rawVelocityY = (node.y - dragging.lastY) / elapsed;
       dragging.velocityX = dragging.velocityX * 0.42 + rawVelocityX * 0.58;
       dragging.velocityY = dragging.velocityY * 0.42 + rawVelocityY * 0.58;
+      const resistance = Math.hypot(
+        point.x + dragging.offsetX - node.x,
+        point.y + dragging.offsetY - node.y
+      );
+      if (resistance > 8 && !dragging.againstLimit) {
+        dragging.againstLimit = window.siteHaptics.pulse(20);
+      } else if (resistance < 3) {
+        dragging.againstLimit = false;
+      }
       dragging.lastX = node.x;
       dragging.lastY = node.y;
       dragging.lastTime = now;
@@ -573,6 +582,7 @@
         const releasedNode = nodes[releasedDrag.index];
         releasedNode.previousX = releasedNode.x - velocityX * STEP;
         releasedNode.previousY = releasedNode.y - velocityY * STEP;
+        window.siteHaptics.pulse(6 + Math.min(12, Math.hypot(velocityX, velocityY) / 150));
       }
 
       render();
@@ -586,9 +596,15 @@
       }
 
       icon.setAttribute("aria-grabbed", "false");
+      const hapticTarget = window.siteHaptics.attach(icon);
 
       icon.addEventListener("pointerdown", function (event) {
-        event.preventDefault();
+        if (dragging || event.button !== 0) {
+          return;
+        }
+        if (!hapticTarget) {
+          event.preventDefault();
+        }
         hasUserInteracted = true;
         const point = canvasPoint(event);
         const node = nodes[index];
@@ -603,10 +619,14 @@
           lastTime: now,
           velocityX: 0,
           velocityY: 0,
+          hapticTarget: hapticTarget,
+          againstLimit: false,
         };
-        icon.setPointerCapture(event.pointerId);
+        // Capture on the label so release stays a real Safari switch activation.
+        (hapticTarget || icon).setPointerCapture(event.pointerId);
         icon.classList.add("is-dragging");
         icon.setAttribute("aria-grabbed", "true");
+        window.siteHaptics.pulse(8);
         startAnimation();
       });
 

@@ -12,7 +12,7 @@
     }
 
     particles.interactivity.events.onclick.enable = false;
-    canvas.addEventListener("click", function (event) {
+    function stimulateNodes(event) {
       const canvasRect = canvas.getBoundingClientRect();
       const ratioX = particles.canvas.w / canvasRect.width;
       const ratioY = particles.canvas.h / canvasRect.height;
@@ -29,7 +29,14 @@
         });
       }
       particles.__neuralStimulus = clickPosition;
-    });
+      window.siteHaptics.pulse(10);
+    }
+
+    canvas.addEventListener("click", stimulateNodes);
+    const hapticTarget = window.siteHaptics.attach(canvas.parentElement);
+    if (hapticTarget) {
+      hapticTarget.addEventListener("click", stimulateNodes);
+    }
   }
 
   function enableNeuralSpikes(particles) {

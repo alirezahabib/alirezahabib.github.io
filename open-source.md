@@ -11,6 +11,7 @@ This site is built with and inspired by open-source projects whose work made it 
 - [Jekyll](https://jekyllrb.com/), the static-site generator.
 - [cvless](https://github.com/piazzai/cvless), the original site theme.
 - [particles.js](https://vincentgarreau.com/particles.js/), which powers the network animation.
+- [ios-haptics](https://github.com/tijnjh/ios-haptics), adapted for Safari's native tap feedback.
 - [Bootstrap](https://getbootstrap.com/), for the responsive layout foundation.
 - [Iconoir](https://iconoir.com/), for interface and social icons.
 - [Open Color](https://yeun.github.io/open-color/), for the color system.
