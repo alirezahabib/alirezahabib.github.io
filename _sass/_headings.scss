@@ -12,6 +12,16 @@ h1,h2,h3 {
   }
 }
 
+.name-middle {
+  opacity: 0.65;
+}
+
+@media print {
+  .name-middle {
+    opacity: 1;
+  }
+}
+
 h1 {
   font-size: 1.5em;
 

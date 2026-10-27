@@ -5,7 +5,7 @@ title: Home
 
 # Hello
 
-I'm Alireza Habibzadeh (in Persian: علیرضا حبیب زاده), an electrical engineering PhD student at USC and a research assistant with Professor Maryam Shanechi in the [Neural Systems Engineering & Information Processing Lab](https://nseip.usc.edu/){:target="_blank"}. We develop machine learning and dynamical systems methods for modeling and decoding brain activity, and we're currently building a foundation model trained on iEEG neural recordings.
+I'm Alireza Habib Zadeh (in Persian: علیرضا حبیب زاده), an electrical engineering PhD student at USC and a research assistant with Professor Maryam Shanechi in the [Neural Systems Engineering & Information Processing Lab](https://nseip.usc.edu/){:target="_blank"}. We develop machine learning and dynamical systems methods for modeling and decoding brain activity, and we're currently building a foundation model trained on iEEG neural recordings.
 
 {% comment %}
 Check out

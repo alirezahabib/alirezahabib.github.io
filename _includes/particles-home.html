@@ -2,10 +2,10 @@
   <div class="jumbotron text-center">
     {% if site.photo %}
     <div class="particles-photo-frame">
-      <img class="particles-photo" src="{{ site.photo }}" alt="Portrait of Alireza Habibzadeh"/>
+      <img class="particles-photo" src="{{ site.photo }}" alt="Portrait of Alireza Habib Zadeh"/>
     </div>
     {% endif %}
-    <h1 class="particles-title">{{ site.title }}</h1>
+    <h1 class="particles-title">{% include display-name.html %}</h1>
     <h1 class="particles-subtitle">{{ site.taglong }}</h1>
     <h1 class="particles-subsubtitle">{{ site.taglong2 }}</h1>
     <div class="nowrap">

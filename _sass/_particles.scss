@@ -137,22 +137,30 @@
   right: clamp(1rem, 7vw, 6rem);
   color: var(--color-particles-text);
   font-family: var(--type-serif);
-  font-size: 0.78rem;
+  font-size: 0.66rem;
   font-style: italic;
   white-space: nowrap;
-  opacity: 0.82;
+  opacity: 0.52;
   pointer-events: none;
 
   &::before {
     content: "↖";
     display: inline-block;
     margin-right: 0.25rem;
-    font-size: 1.05rem;
+    font-size: 0.88rem;
     transform: rotate(7deg);
   }
 }
 
 @media screen and (max-width: 520px) {
+  #particles-js .jumbotron {
+    width: calc(100% - 1rem);
+  }
+
+  .particles-title {
+    font-size: min(2.5em, 9.4vw);
+  }
+
   .particles-canvas-hint {
     top: 75%;
   }

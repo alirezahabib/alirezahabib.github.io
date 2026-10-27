@@ -293,9 +293,15 @@
       const hasSideRoom = target.restX - target.halfWidth >= 165;
 
       context.save();
+      // Shrink the entire hint around its arrow tip so it still points at the flag.
+      const tipX = hasSideRoom ? endX : target.restX;
+      const tipY = hasSideRoom ? endY : target.restY + target.halfHeight + 8;
+      context.translate(tipX, tipY);
+      context.scale(0.82, 0.82);
+      context.translate(-tipX, -tipY);
       context.strokeStyle = linkColor;
       context.fillStyle = linkColor;
-      context.globalAlpha = 0.82;
+      context.globalAlpha = 0.52;
       context.lineWidth = 2;
       context.lineCap = "round";
       context.lineJoin = "round";
